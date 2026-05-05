@@ -102,24 +102,78 @@ Se puede consultar los distintos tipos de estaciones, se pueden aplicar filtros 
 Dentro de la zona de interés en este proyecto, los datos de caudales sólo estan disponibles para las estaciones Barranqueras y Corrientes del sitio web del INA.
 
 
-# Lectura y procesamiento de datos
+# Estación Corrientes
+
+**Evolución de alturas a lo largo de los años**
+
+Usando plotly
+
+```{python}
+
+#| code-fold: true
+
+import pandas as pd
+import plotly.express as px
+from io import StringIO
+
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\Alturas")
+
+
+# Convertir la columna de fecha a tipo datetime
+df['Fecha y Hora'] = pd.to_datetime(df['Fecha y Hora'])
+
+# Crear la gráfica interactiva
+fig = px.line(df, x='Fecha y Hora', y='altura', 
+              title='Variación de la Altura a lo Largo del Tiempo',
+              labels={'Fecha y Hora': 'Fecha', 'altura': 'Altura (m)'},
+              markers=True)
+
+# Personalizar la gráfica
+fig.update_traces(line=dict(width=3, color='royalblue'),
+                  marker=dict(size=8, symbol='circle', line=dict(width=2, color='white')))
+fig.update_layout(
+    hovermode='x unified',
+    template='plotly_white',
+    xaxis=dict(tickformat='%Y-%m-%d', tickangle=45),
+    yaxis=dict(title='Altura (metros)'),
+    height=600,
+    margin=dict(l=50, r=50, t=80, b=50)
+)
+
+# Agregar anotaciones para valores extremos
+min_idx = df['altura'].idxmin()
+max_idx = df['altura'].idxmax()
+
+fig.add_annotation(
+    x=df.loc[min_idx, 'Fecha y Hora'],
+    y=df.loc[min_idx, 'altura'],
+    text=f"Mínimo: {df.loc[min_idx, 'altura']}m",
+    showarrow=True,
+    arrowhead=2,
+    arrowsize=1,
+    arrowwidth=2,
+    arrowcolor='red'
+)
+
+fig.add_annotation(
+    x=df.loc[max_idx, 'Fecha y Hora'],
+    y=df.loc[max_idx, 'altura'],
+    text=f"Máximo: {df.loc[max_idx, 'altura']}m",
+    showarrow=True,
+    arrowhead=2,
+    arrowsize=1,
+    arrowwidth=2,
+    arrowcolor='green'
+)
+
+# Guardar la gráfica como un archivo HTML
+fig.write_html("index.html")
+
+
+```
 
 
 
-
-
-
-Se utilizará la con función pd.merge_asof.
-
-Esta función es especial porque:
-
--Busca la coincidencia basándose en la fecha y hora.
-
--Si no hay una coincidencia exacta, busca la medición de altura más cercana en el tiempo (generalmente la última disponible antes de la medición química).
-
-
-
-**Fusiones**
 
 **Altura vs pH**
 
