@@ -1,0 +1,7 @@
+
+Alturas
+
+
+
+https://alerta.ina.gob.ar/pub/datos/datos&timeStart=1900-01-01&timeEnd=2026-04-27&seriesId=19&siteCode=19&varId=2&format=csv CORRIENTES
+

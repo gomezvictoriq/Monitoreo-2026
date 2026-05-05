@@ -1,0 +1,23 @@
+### Request header
+###	request=datos
+###	timeStart=1900-01-01
+###	timeEnd=2026-04-21
+###	seriesId=865
+###	siteCode=16
+###	varId=4
+###	format=csv
+### Response header
+###	request=datos
+###	seriesId=865
+###	timeEnd=20260421T000000
+###	creationTime=2026-04-28T14:07:12-03:00
+###	seriesid=865
+###	seriesmetadata=proc_abrev:curva,unit_abrev:m^3/s,procId:2,unitId:10,var_abrev:caudal,varId:4,seriesId:865
+###	responseTimestamp=2026-04-28T14:07:12
+###	queryUrl=request=datos&timeStart=1900-01-01&timeEnd=2026-04-21&seriesId=865&siteCode=16&varId=4&format=csv
+###	timeStart=19000101T000000
+###	sitemetadata=redId:10,geom:type:Point,coordinates:-57.33326783,-27.42336098,estacion_abrev:ITAIBATE,red_name:escalas Prefectura Nacional,siteCode:16
+###	sitecode=16
+
+### obs_id,timestart,timeend,valor,timeupdate
+### End of data

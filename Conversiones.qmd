@@ -1,0 +1,500 @@
+Parámetros de la calidad datos del SNIH
+
+Excel a csv Corrientes
+```{python}
+import pandas as pd
+import os
+from pathlib import Path
+
+def convertir_xls_a_csv(carpeta_entrada, carpeta_salida):
+    """
+    Convierte todos los archivos .xls y .xlsx de 'carpeta_entrada' 
+    y los guarda en 'carpeta_salida'.
+    """
+    ruta_entrada = Path(carpeta_entrada)
+    
+    # 1. Asegurar que la carpeta de destino exista
+    ruta_salida = Path(carpeta_salida)
+    ruta_salida.mkdir(parents=True, exist_ok=True)
+    
+    # Buscar archivos
+    archivos = list(ruta_entrada.glob("*.xls")) + list(ruta_entrada.glob("*.xlsx"))
+    
+    if not archivos:
+        print(f"⚠️ No se encontraron archivos .xls o .xlsx en: {carpeta_entrada}")
+        return
+
+    print(f"🔄 Encontrados {len(archivos)} archivos. Iniciando conversión a: {carpeta_salida}...")
+
+    for archivo in archivos:
+        try:
+            # Leer el Excel
+            df = pd.read_excel(archivo)
+            
+            # 2. CAMBIO CLAVE: Crear la ruta completa en la carpeta de destino
+            nombre_salida = ruta_salida / archivo.name
+            # Si quieres cambiar la extensión a .csv explícitamente:
+            nombre_salida = nombre_salida.with_suffix('.csv')
+            
+            # Guardar como CSV
+            df.to_csv(nombre_salida, index=False, encoding='utf-8-sig')
+            
+            print(f"✅ {archivo.name} -> {nombre_salida.name}")
+            
+        except Exception as e:
+            print(f"❌ Error al convertir {archivo.name}: {e}")
+
+    print(f"\n🎉 ¡Todo listo! Archivos guardados en: {carpeta_salida}")
+
+# --- CONFIGURACIÓN ---
+carpeta_origen = r"D:\Monitoreo 2026\Base de datos\SNIH\Estación 3805 Corrientes"  # Donde están los .xls
+carpeta_destino = r"D:\Monitoreo 2026\Input\csv\Corrientes"    # Donde quieres los .csv
+
+# Ejecutar
+convertir_xls_a_csv(carpeta_origen, carpeta_destino)
+
+```
+
+Excel a csv Isla del cerrito
+
+```{python}
+
+import pandas as pd
+import os
+from pathlib import Path
+
+def convertir_xls_a_csv(carpeta_entrada, carpeta_salida):
+    """
+    Convierte todos los archivos .xls y .xlsx de 'carpeta_entrada' 
+    y los guarda en 'carpeta_salida'.
+    """
+    ruta_entrada = Path(carpeta_entrada)
+    
+    # 1. Asegurar que la carpeta de destino exista
+    ruta_salida = Path(carpeta_salida)
+    ruta_salida.mkdir(parents=True, exist_ok=True)
+    
+    # Buscar archivos
+    archivos = list(ruta_entrada.glob("*.xls")) + list(ruta_entrada.glob("*.xlsx"))
+    
+    if not archivos:
+        print(f"⚠️ No se encontraron archivos .xls o .xlsx en: {carpeta_entrada}")
+        return
+
+    print(f"🔄 Encontrados {len(archivos)} archivos. Iniciando conversión a: {carpeta_salida}...")
+
+    for archivo in archivos:
+        try:
+            # Leer el Excel
+            df = pd.read_excel(archivo)
+            
+            # 2. CAMBIO CLAVE: Crear la ruta completa en la carpeta de destino
+            nombre_salida = ruta_salida / archivo.name
+            # Si quieres cambiar la extensión a .csv explícitamente:
+            nombre_salida = nombre_salida.with_suffix('.csv')
+            
+            # Guardar como CSV
+            df.to_csv(nombre_salida, index=False, encoding='utf-8-sig')
+            
+            print(f"✅ {archivo.name} -> {nombre_salida.name}")
+            
+        except Exception as e:
+            print(f"❌ Error al convertir {archivo.name}: {e}")
+
+    print(f"\n🎉 ¡Todo listo! Archivos guardados en: {carpeta_salida}")
+
+# --- CONFIGURACIÓN ---
+carpeta_origen = r"D:\Monitoreo 2026\Base de datos\SNIH\Estación 2406 - Isla del cerrito"  # Donde están los .xls
+carpeta_destino = r"D:\Monitoreo 2026\Input\csv\Isla del Cerrito"    # Donde quieres los .csv
+
+# Ejecutar
+convertir_xls_a_csv(carpeta_origen, carpeta_destino)
+
+```
+
+
+Limpieza CSV INA - Altura y Caudales Corrientes
+
+Alturas
+
+```{python}
+
+import pandas as pd
+
+df_alturas= pd.read_csv(r"D:\Monitoreo 2026\Base de datos\Alturas INA\Alturas_Corrientes.csv")
+
+df_alturas = df_alturas.rename(columns={'timestart': 'Fecha y Hora','valor': 'altura'})
+df_alturas = df_alturas.drop(columns=['obs_id', 'timeend', 'obs_id','timeupdate'])
+df_alturas['Fecha y Hora'] = pd.to_datetime(df_alturas['Fecha y Hora'])
+
+df_alturas.head()
+df_alturas.to_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\Alturas", index=False)
+
+#print(df_alturas.dtypes) # Para verificar si la columna fecha, es tipo datetime64. Para trabajar como fechas dentro de python y no como objeto o texto.
+
+```
+
+Caudales
+
+```{python}
+import pandas as pd
+
+df_caudales = pd.read_csv(r"D:\Monitoreo 2026\Base de datos\Caudal INA\Caudal_Corrientes.csv")
+
+df_caudales = df_caudales.rename(columns={'timestart': 'Fecha y Hora','valor': 'caudal'})
+df_caudales = df_caudales.drop(columns=['obs_id', 'timeend', 'obs_id','timeupdate'])
+df_caudales['Fecha y Hora'] = pd.to_datetime(df_caudales['Fecha y Hora'])
+#df_caudales['día'] = df_caudales['Fecha y Hora'].dt.date
+
+df_caudales.head()
+df_caudales.to_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\Caudales", index=False)
+
+#print(df_alturas.dtypes)
+```
+
+Limpieza y arreglo csv
+**ph** 
+
+```{python}
+import pandas as pd
+
+df_ph = pd.read_csv(r"D:\Monitoreo 2026\Input\csv\Corrientes\Historicos-Estacion 3805 - ph.csv")
+
+df_ph['Fecha y Hora'] = pd.to_datetime(df_ph['Fecha y Hora'], dayfirst=True, errors='coerce')
+#df_caudales['día'] = df_caudales['Fecha y Hora'].dt.date
+
+df_ph.to_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\pH", index=False)
+#print(df_ph.head(15))
+ 
+
+#print(df_ph.dtypes) # Para verificar si la columna fecha, es tipo datetime64. Para trabajar como fechas dentro de python y no como objeto o texto.
+```
+
+**Turbidez** 
+
+```{python}
+import pandas as pd
+
+df_turb = pd.read_csv(r"D:\Monitoreo 2026\Input\csv\Corrientes\Historicos-Estacion 3805 - turbidez.csv")
+
+df_turb['Fecha y Hora'] = pd.to_datetime(df_turb['Fecha y Hora'], dayfirst=True, errors='coerce')
+#df_turb['día'] = df_turb['Fecha y Hora'].dt.date
+
+
+print(df_turb.head(15))
+df_turb.to_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\turbidez", index=False)
+
+ 
+
+#print(df_turb.dtypes) # Para verificar si la columna fecha, es tipo datetime64. Para trabajar como fechas dentro de python y no como objeto o texto.
+```
+
+
+**Conductividad**
+
+```{python}
+
+import pandas as pd
+
+df_cond = pd.read_csv(r"D:\Monitoreo 2026\Input\csv\Corrientes\Historicos-Estacion 3805- conductividad.csv")
+
+df_cond['Fecha y Hora'] = pd.to_datetime(df_cond['Fecha y Hora'], dayfirst=True, errors='coerce')
+#df_turb['día'] = df_turb['Fecha y Hora'].dt.date
+
+
+#print(df_cond.head(15))
+ 
+
+#print(df_cond.dtypes) # Para verificar si la columna fecha, es tipo datetime64. Para trabajar como fechas dentro de python y no como objeto o texto.
+
+```
+
+
+**Sólidos Totales**
+
+
+```{python}
+
+import pandas as pd
+
+df_st = pd.read_csv(r"D:\Monitoreo 2026\Input\csv\Corrientes\Historicos-Estacion 3805- solidos totales.csv")
+
+df_st['Fecha y Hora'] = pd.to_datetime(df_st['Fecha y Hora'], dayfirst=True, errors='coerce')
+#df_turb['día'] = df_turb['Fecha y Hora'].dt.date
+
+
+#print(df_st.head(15))
+df_st.to_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\sol_tot", index=False)
+
+ 
+
+#print(df_st.dtypes) # Para verificar si la columna fecha, es tipo datetime64. Para trabajar como fechas dentro de python y no como objeto o texto.
+
+```
+
+
+**Fusiones**
+
+**Altura vs pH**
+
+```{python}
+#| code-fold: true
+import pandas as pd
+
+df_alturas = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\Alturas")
+df_ph = pd.read_csv(r"Output/csv/Corrientes/pH")
+
+# 1. Asegurarse de que las columnas de fecha sean datetime (ya lo están según tu output)
+# Pero por seguridad, forzamos el formato si hubiera dudas
+df_ph['Fecha y Hora'] = pd.to_datetime(df_ph['Fecha y Hora'])
+df_alturas['Fecha y Hora'] = pd.to_datetime(df_alturas['Fecha y Hora'])
+
+# 2. IMPORTANTE: Ordenar ambos DataFrames por la columna de fecha
+# merge_asof REQUERIR que los datos estén ordenados cronológicamente
+df_ph = df_ph.sort_values('Fecha y Hora')
+df_alturas = df_alturas.sort_values('Fecha y Hora')
+
+# 3. Realizar la fusión con merge_asof
+df_fusionado = pd.merge_asof(
+    df_ph,       # Tabla principal (la que tiene muchas filas)
+    df_alturas,             # Tabla de referencia (la que tiene 1 altura por día)
+    on='Fecha y Hora',      # Columna de tiempo común
+    direction='backward'    # 'backward': Toma la altura más reciente ANTES de la hora de la medición química.
+                            # Esto es ideal: Si midiste pH a las 12:00, toma la altura de las 07:00.
+)
+
+# 4. Limpiar nombres de columnas si es necesario
+# Ahora tendrás: Fecha y Hora, Conductividad, altura, día (de la tabla de alturas)
+print(df_fusionado)
+
+# Correlación
+
+# Asegúrate de que las columnas sean numéricas (a veces vienen como texto por errores de lectura)
+# Tu DataFrame se llama df_fusionado (o el nombre que le diste)
+df_fusionado['pH [UpH]'] = pd.to_numeric(df_fusionado['pH [UpH]'], errors='coerce')
+df_fusionado['altura'] = pd.to_numeric(df_fusionado['altura'], errors='coerce')
+
+# Eliminar filas donde falten datos en cualquiera de las dos columnas
+# (La correlación no se puede calcular con valores NaN)
+df_limpio = df_fusionado.dropna(subset=['pH [UpH]', 'altura'])
+
+# Calcular la correlación
+r = df_limpio['pH [UpH]'].corr(df_limpio['altura'])
+
+print(f"Coeficiente de correlación (r): {r:.4f}")
+
+
+```
+
+Correlación pH vs Altura
+```{python} 
+#| code-fold: true
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+# ==========================================
+# 1. PREPARACIÓN DE DATOS
+# ==========================================
+# Asumiendo que tu dataframe fusionado se llama 'df_fusionado'
+# Si lo guardaste en una variable diferente, cambia el nombre aquí.
+
+# 1.1 Aseguramos que sean numéricas
+col_ph = 'pH [UpH]'  # Ajusta este nombre si tu columna se llama diferente
+col_alt = 'altura'           # Ajusta este nombre si tu columna se llama diferente
+
+# Verificar si las columnas existen (para evitar errores)
+if col_ph not in df_fusionado.columns or col_alt not in df_fusionado.columns:
+    print("❌ Error: No se encontraron las columnas 'pH [UpH]' o 'altura'.")
+    print(f"Columnas disponibles: {df_fusionado.columns.tolist()}")
+else:
+    # Convertir a numérico (descartando textos o errores)
+    df_fusionado[col_ph] = pd.to_numeric(df_fusionado[col_ph], errors='coerce')
+    df_fusionado[col_alt] = pd.to_numeric(df_fusionado[col_alt], errors='coerce')
+
+    # Eliminar filas con NaN (datos faltantes) para el cálculo y gráfico
+    df_limpio = df_fusionado.dropna(subset=[col_ph, col_alt])
+
+
+
+    # ==========================================
+    # 2. CÁLCULO DE CORRELACIÓN
+    # ==========================================
+    if len(df_limpio) > 0:
+        r = df_limpio[col_ph].corr(df_limpio[col_alt])
+        print(f"\n📊 Coeficiente de Correlación (r): {r:.4f}")
+    else:
+        r = 0
+        print("\n⚠️ No hay datos suficientes para calcular la correlación.")
+
+    # ==========================================
+    # 3. GENERAR GRÁFICO
+    # ==========================================
+    plt.style.use('seaborn-v0_8-whitegrid') # Estilo limpio
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Crear el scatter plot
+    # s=40: tamaño de los puntos
+    # alpha=0.6: transparencia para ver superposiciones
+    scatter = ax.scatter(df_limpio[col_alt], df_limpio[col_ph], 
+                         color='#1f77b4', alpha=0.6, edgecolors='w', s=50, label='Datos Medidos')
+
+    # Opcional: Añadir una línea de tendencia (Regresión lineal)
+    if len(df_limpio) > 1:
+        # Calcular pendiente e intersección
+        m, b = np.polyfit(df_limpio[col_alt], df_limpio[col_ph], 1)
+        # Dibujar la línea
+        x_line = np.linspace(df_limpio[col_alt].min(), df_limpio[col_alt].max(), 100)
+        ax.plot(x_line, m * x_line + b, color='#d62728', linewidth=2, label=f'Tendencia (r={r:.2f})')
+
+    # Configuración de etiquetas y título
+    ax.set_xlabel(f'Altura del Río ({col_alt})', fontsize=12)
+    ax.set_ylabel(f'pH', fontsize=12)
+    ax.set_title(f'Relación: pH vs. Altura\n(Coeficiente de Pearson r = {r:.3f})', fontsize=14, fontweight='bold')
+    ax.legend()
+
+    # Limitar ejes si hay valores extremos (outliers) que rompen la escala
+    # Esto ayuda a ver mejor la mayoría de los puntos
+    # ax.set_xlim(left=0) # Si la altura no puede ser negativa
+    # ax.set_ylim(bottom=0) # Si la turbidez no puede ser negativa
+
+    plt.tight_layout()
+    plt.show()
+
+```
+
+
+**altura vs turbidez**
+
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+
+df_alturas = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\Alturas")
+df_turb = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\turbidez")
+
+# 1. Asegurarse de que las columnas de fecha sean datetime (ya lo están según tu output)
+# Pero por seguridad, forzamos el formato si hubiera dudas
+df_turb['Fecha y Hora'] = pd.to_datetime(df_turb['Fecha y Hora'])
+df_alturas['Fecha y Hora'] = pd.to_datetime(df_alturas['Fecha y Hora'])
+
+# 2. IMPORTANTE: Ordenar ambos DataFrames por la columna de fecha
+# merge_asof REQUERIR que los datos estén ordenados cronológicamente
+df_turb = df_turb.sort_values('Fecha y Hora')
+df_alturas = df_alturas.sort_values('Fecha y Hora')
+
+# 3. Realizar la fusión con merge_asof
+df_fusionado = pd.merge_asof(
+    df_turb,       # Tabla principal (la que tiene muchas filas)
+    df_alturas,             # Tabla de referencia (la que tiene 1 altura por día)
+    on='Fecha y Hora',      # Columna de tiempo común
+    direction='backward'    # 'backward': Toma la altura más reciente ANTES de la hora de la medición química.
+                            # Esto es ideal: Si midiste pH a las 12:00, toma la altura de las 07:00.
+)
+
+# 4. Limpiar nombres de columnas si es necesario
+# Ahora tendrás: Fecha y Hora, Conductividad, altura, día (de la tabla de alturas)
+print(df_fusionado)
+
+# Correlación
+
+# Asegúrate de que las columnas sean numéricas (a veces vienen como texto por errores de lectura)
+# Tu DataFrame se llama df_fusionado (o el nombre que le diste)
+df_fusionado['TURBIDEZ [NTU]'] = pd.to_numeric(df_fusionado['TURBIDEZ [NTU]'], errors='coerce')
+df_fusionado['altura'] = pd.to_numeric(df_fusionado['altura'], errors='coerce')
+
+# Eliminar filas donde falten datos en cualquiera de las dos columnas
+# (La correlación no se puede calcular con valores NaN)
+df_limpio = df_fusionado.dropna(subset=['TURBIDEZ [NTU]', 'altura'])
+
+# Calcular la correlación
+r = df_limpio['TURBIDEZ [NTU]'].corr(df_limpio['altura'])
+
+print(f"Coeficiente de correlación (r): {r:.4f}")
+
+```
+
+
+**Correlación Turbidez vs Altura**
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+# ==========================================
+# 1. PREPARACIÓN DE DATOS
+# ==========================================
+# Asumiendo que tu dataframe fusionado se llama 'df_fusionado'
+# Si lo guardaste en una variable diferente, cambia el nombre aquí.
+
+# 1.1 Aseguramos que sean numéricas
+col_turb = 'TURBIDEZ [NTU]'  # Ajusta este nombre si tu columna se llama diferente
+col_alt = 'altura'           # Ajusta este nombre si tu columna se llama diferente
+
+# Verificar si las columnas existen (para evitar errores)
+if col_turb not in df_fusionado.columns or col_alt not in df_fusionado.columns:
+    print("❌ Error: No se encontraron las columnas 'TURBIDEZ [NTU]' o 'altura'.")
+    print(f"Columnas disponibles: {df_fusionado.columns.tolist()}")
+else:
+    # Convertir a numérico (descartando textos o errores)
+    df_fusionado[col_turb] = pd.to_numeric(df_fusionado[col_turb], errors='coerce')
+    df_fusionado[col_alt] = pd.to_numeric(df_fusionado[col_alt], errors='coerce')
+
+    # Eliminar filas con NaN (datos faltantes) para el cálculo y gráfico
+    df_limpio = df_fusionado.dropna(subset=[col_turb, col_alt])
+
+
+
+    # ==========================================
+    # 2. CÁLCULO DE CORRELACIÓN
+    # ==========================================
+    if len(df_limpio) > 0:
+        r = df_limpio[col_turb].corr(df_limpio[col_alt])
+        print(f"\n📊 Coeficiente de Correlación (r): {r:.4f}")
+    else:
+        r = 0
+        print("\n⚠️ No hay datos suficientes para calcular la correlación.")
+
+    # ==========================================
+    # 3. GENERAR GRÁFICO
+    # ==========================================
+    plt.style.use('seaborn-v0_8-whitegrid') # Estilo limpio
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Crear el scatter plot
+    # s=40: tamaño de los puntos
+    # alpha=0.6: transparencia para ver superposiciones
+    scatter = ax.scatter(df_limpio[col_alt], df_limpio[col_turb], 
+                         color='#1f77b4', alpha=0.6, edgecolors='w', s=50, label='Datos Medidos')
+
+    # Opcional: Añadir una línea de tendencia (Regresión lineal)
+    if len(df_limpio) > 1:
+        # Calcular pendiente e intersección
+        m, b = np.polyfit(df_limpio[col_alt], df_limpio[col_turb], 1)
+        # Dibujar la línea
+        x_line = np.linspace(df_limpio[col_alt].min(), df_limpio[col_alt].max(), 100)
+        ax.plot(x_line, m * x_line + b, color='#d62728', linewidth=2, label=f'Tendencia (r={r:.2f})')
+
+    # Configuración de etiquetas y título
+    ax.set_xlabel(f'Altura del Río ({col_alt})', fontsize=12)
+    ax.set_ylabel(f'Turbidez', fontsize=12)
+    ax.set_title(f'Relación: Turbidez vs. Altura\n(Coeficiente de Pearson r = {r:.3f})', fontsize=14, fontweight='bold')
+    ax.legend()
+
+    # Limitar ejes si hay valores extremos (outliers) que rompen la escala
+    # Esto ayuda a ver mejor la mayoría de los puntos
+    # ax.set_xlim(left=0) # Si la altura no puede ser negativa
+    # ax.set_ylim(bottom=0) # Si la turbidez no puede ser negativa
+
+    plt.tight_layout()
+    plt.show()
+
+
+
+```

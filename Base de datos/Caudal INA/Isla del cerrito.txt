@@ -1,0 +1,23 @@
+### Request header
+###	request=datos
+###	timeStart=1900-01-18
+###	timeEnd=2026-04-27
+###	seriesId=908
+###	siteCode=59
+###	varId=4
+###	format=csv
+### Response header
+###	sitemetadata=red_name:escalas Prefectura Nacional,geom:coordinates:-58.6166666666667,-27.3166666666667,type:Point,estacion_abrev:null,redId:10,siteCode:59
+###	responseTimestamp=2026-04-28T18:16:52
+###	seriesmetadata=proc_abrev:curva,procId:2,unitId:10,varId:4,var_abrev:caudal,seriesId:908,unit_abrev:m^3/s
+###	creationTime=2026-04-28T18:16:52-03:00
+###	queryUrl=request=datos&timeStart=1900-01-18&timeEnd=2026-04-27&seriesId=908&siteCode=59&varId=4&format=csv
+###	timeEnd=20260427T000000
+###	request=datos
+###	sitecode=59
+###	seriesid=908
+###	seriesId=908
+###	timeStart=19000118T000000
+
+### obs_id,timestart,timeend,valor,timeupdate
+### End of data
