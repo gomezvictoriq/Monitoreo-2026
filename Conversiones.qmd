@@ -1,3 +1,6 @@
+
+# Corrientes
+
 Parámetros de la calidad datos del SNIH
 
 Excel a csv Corrientes
@@ -49,63 +52,6 @@ def convertir_xls_a_csv(carpeta_entrada, carpeta_salida):
 # --- CONFIGURACIÓN ---
 carpeta_origen = r"D:\Monitoreo 2026\Base de datos\SNIH\Estación 3805 Corrientes"  # Donde están los .xls
 carpeta_destino = r"D:\Monitoreo 2026\Input\csv\Corrientes"    # Donde quieres los .csv
-
-# Ejecutar
-convertir_xls_a_csv(carpeta_origen, carpeta_destino)
-
-```
-
-Excel a csv Isla del cerrito
-
-```{python}
-
-import pandas as pd
-import os
-from pathlib import Path
-
-def convertir_xls_a_csv(carpeta_entrada, carpeta_salida):
-    """
-    Convierte todos los archivos .xls y .xlsx de 'carpeta_entrada' 
-    y los guarda en 'carpeta_salida'.
-    """
-    ruta_entrada = Path(carpeta_entrada)
-    
-    # 1. Asegurar que la carpeta de destino exista
-    ruta_salida = Path(carpeta_salida)
-    ruta_salida.mkdir(parents=True, exist_ok=True)
-    
-    # Buscar archivos
-    archivos = list(ruta_entrada.glob("*.xls")) + list(ruta_entrada.glob("*.xlsx"))
-    
-    if not archivos:
-        print(f"⚠️ No se encontraron archivos .xls o .xlsx en: {carpeta_entrada}")
-        return
-
-    print(f"🔄 Encontrados {len(archivos)} archivos. Iniciando conversión a: {carpeta_salida}...")
-
-    for archivo in archivos:
-        try:
-            # Leer el Excel
-            df = pd.read_excel(archivo)
-            
-            # 2. CAMBIO CLAVE: Crear la ruta completa en la carpeta de destino
-            nombre_salida = ruta_salida / archivo.name
-            # Si quieres cambiar la extensión a .csv explícitamente:
-            nombre_salida = nombre_salida.with_suffix('.csv')
-            
-            # Guardar como CSV
-            df.to_csv(nombre_salida, index=False, encoding='utf-8-sig')
-            
-            print(f"✅ {archivo.name} -> {nombre_salida.name}")
-            
-        except Exception as e:
-            print(f"❌ Error al convertir {archivo.name}: {e}")
-
-    print(f"\n🎉 ¡Todo listo! Archivos guardados en: {carpeta_salida}")
-
-# --- CONFIGURACIÓN ---
-carpeta_origen = r"D:\Monitoreo 2026\Base de datos\SNIH\Estación 2406 - Isla del cerrito"  # Donde están los .xls
-carpeta_destino = r"D:\Monitoreo 2026\Input\csv\Isla del Cerrito"    # Donde quieres los .csv
 
 # Ejecutar
 convertir_xls_a_csv(carpeta_origen, carpeta_destino)
@@ -189,9 +135,7 @@ df_turb.to_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\turbidez", index=False)
 #print(df_turb.dtypes) # Para verificar si la columna fecha, es tipo datetime64. Para trabajar como fechas dentro de python y no como objeto o texto.
 ```
 
-
 **Conductividad**
-
 ```{python}
 
 import pandas as pd
@@ -209,9 +153,7 @@ df_cond['Fecha y Hora'] = pd.to_datetime(df_cond['Fecha y Hora'], dayfirst=True,
 
 ```
 
-
 **Sólidos Totales**
-
 
 ```{python}
 
@@ -421,6 +363,7 @@ print(f"Coeficiente de correlación (r): {r:.4f}")
 **Correlación Turbidez vs Altura**
 
 ```{python}
+
 #| code-fold: true
 
 import pandas as pd
@@ -497,3 +440,70 @@ else:
 
 
 ```
+
+
+
+# Isla del Cerrito
+
+Excel de Calidad del agua a csv - Isla del cerrito
+
+```{python}
+
+import pandas as pd
+import os
+from pathlib import Path
+
+def convertir_xls_a_csv(carpeta_entrada, carpeta_salida):
+    """
+    Convierte todos los archivos .xls y .xlsx de 'carpeta_entrada' 
+    y los guarda en 'carpeta_salida'.
+    """
+    ruta_entrada = Path(carpeta_entrada)
+    
+    # 1. Asegurar que la carpeta de destino exista
+    ruta_salida = Path(carpeta_salida)
+    ruta_salida.mkdir(parents=True, exist_ok=True)
+    
+    # Buscar archivos
+    archivos = list(ruta_entrada.glob("*.xls")) + list(ruta_entrada.glob("*.xlsx"))
+    
+    if not archivos:
+        print(f"⚠️ No se encontraron archivos .xls o .xlsx en: {carpeta_entrada}")
+        return
+
+    print(f"🔄 Encontrados {len(archivos)} archivos. Iniciando conversión a: {carpeta_salida}...")
+
+    for archivo in archivos:
+        try:
+            # Leer el Excel
+            df = pd.read_excel(archivo)
+            
+            # 2. CAMBIO CLAVE: Crear la ruta completa en la carpeta de destino
+            nombre_salida = ruta_salida / archivo.name
+            # Si quieres cambiar la extensión a .csv explícitamente:
+            nombre_salida = nombre_salida.with_suffix('.csv')
+            
+            # Guardar como CSV
+            df.to_csv(nombre_salida, index=False, encoding='utf-8-sig')
+            
+            print(f"✅ {archivo.name} -> {nombre_salida.name}")
+            
+        except Exception as e:
+            print(f"❌ Error al convertir {archivo.name}: {e}")
+
+    print(f"\n🎉 ¡Todo listo! Archivos guardados en: {carpeta_salida}")
+
+# --- CONFIGURACIÓN ---
+carpeta_origen = r"D:\Monitoreo 2026\Base de datos\SNIH\Estación 2406 - Isla del cerrito"  # Donde están los .xls
+carpeta_destino = r"D:\Monitoreo 2026\Input\csv\Isla del Cerrito"    # Donde quieres los .csv
+
+# Ejecutar
+convertir_xls_a_csv(carpeta_origen, carpeta_destino)
+
+```
+
+
+
+# Barranqueras
+
+

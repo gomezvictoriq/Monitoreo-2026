@@ -10,7 +10,7 @@ format:
     number-sections: true
     toc: true
     toc-location: left
-    embed-resources: true
+    embed-resources: false
     crossrefs-hover: false
     lang: es
     bibliography: bibliografia/bibliografia.bib
@@ -18,6 +18,7 @@ format:
     theme: flatly
     page-layout: full
     css: styles/styles.css
+
 
     
 
@@ -108,6 +109,15 @@ Dentro de la zona de interés en este proyecto, los datos de caudales sólo esta
 
 Usando plotly
 
+<div style="width: 100%; overflow-x: auto;">
+  <iframe 
+    src="grafica.html" 
+    style="width: 1200px; height: 600px; border: none;"
+    scrolling="no"
+    sandbox="allow-scripts allow-same-origin">
+  </iframe>
+</div>
+
 ```{python}
 
 #| code-fold: true
@@ -116,8 +126,8 @@ import pandas as pd
 import plotly.express as px
 from io import StringIO
 
+# Cargar datos
 df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\Alturas")
-
 
 # Convertir la columna de fecha a tipo datetime
 df['Fecha y Hora'] = pd.to_datetime(df['Fecha y Hora'])
@@ -131,12 +141,14 @@ fig = px.line(df, x='Fecha y Hora', y='altura',
 # Personalizar la gráfica
 fig.update_traces(line=dict(width=3, color='royalblue'),
                   marker=dict(size=8, symbol='circle', line=dict(width=2, color='white')))
+
+# CONFIGURACIÓN DE LAYOUT CORREGIDA (Indentación fija + autosize)
 fig.update_layout(
     hovermode='x unified',
     template='plotly_white',
     xaxis=dict(tickformat='%Y-%m-%d', tickangle=45),
     yaxis=dict(title='Altura (metros)'),
-    height=600,
+    autosize=True,  # Permite que se ajuste al contenedor
     margin=dict(l=50, r=50, t=80, b=50)
 )
 
@@ -166,13 +178,15 @@ fig.add_annotation(
     arrowcolor='green'
 )
 
-# Guardar la gráfica como un archivo HTML
-fig.write_html("index.html")
-
-
+# Guardar la gráfica como un archivo HTML con dimensiones correctas
+fig.write_html(
+    "grafica.html",
+    include_plotlyjs='cdn',
+    full_html=True,
+    default_width='100%',
+    default_height='600px'
+)
 ```
-
-
 
 
 **Altura vs pH**
