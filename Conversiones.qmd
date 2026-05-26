@@ -3,7 +3,7 @@
 
 Parámetros de la calidad datos del SNIH
 
-Excel a csv Corrientes
+**Excel a csv Corrientes**
 ```{python}
 import pandas as pd
 import os
@@ -58,8 +58,7 @@ convertir_xls_a_csv(carpeta_origen, carpeta_destino)
 
 ```
 
-
-Limpieza CSV INA - Altura y Caudales Corrientes
+**Limpieza CSV INA - Altura y Caudales Corrientes**
 
 Alturas
 
@@ -98,7 +97,8 @@ df_caudales.to_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\Caudales", index=Fa
 #print(df_alturas.dtypes)
 ```
 
-Limpieza y arreglo csv
+Limpieza y arreglo csv del SNIH
+
 **ph** 
 
 ```{python}
@@ -148,6 +148,8 @@ df_cond['Fecha y Hora'] = pd.to_datetime(df_cond['Fecha y Hora'], dayfirst=True,
 
 #print(df_cond.head(15))
  
+df_cond.to_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\conductividad", index=False)
+
 
 #print(df_cond.dtypes) # Para verificar si la columna fecha, es tipo datetime64. Para trabajar como fechas dentro de python y no como objeto o texto.
 
@@ -174,8 +176,9 @@ df_st.to_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\sol_tot", index=False)
 
 ```
 
+## Fusiones data frame Corrientes
 
-**Fusiones**
+**Fusión altura/ph**
 
 **Altura vs pH**
 
@@ -307,7 +310,7 @@ else:
 ```
 
 
-**altura vs turbidez**
+**Fusión altura/turbidez**
 
 
 ```{python}
@@ -442,10 +445,33 @@ else:
 ```
 
 
+**Fusión altura/conductividad**
+
 
 # Isla del Cerrito
 
-Excel de Calidad del agua a csv - Isla del cerrito
+
+**Limpieza CSV INA - Altura y Caudales Corrientes**
+
+```{python}
+
+import pandas as pd
+
+df_alturas= pd.read_csv(r"D:\Monitoreo 2026\Input\csv\Isla del Cerrito\Altuas_Isla del Cerrito.csv")
+
+df_alturas = df_alturas.rename(columns={'timestart': 'Fecha y Hora','valor': 'altura'})
+df_alturas = df_alturas.drop(columns=['obs_id', 'timeend', 'obs_id','timeupdate'])
+df_alturas['Fecha y Hora'] = pd.to_datetime(df_alturas['Fecha y Hora'])
+
+df_alturas.head(25)
+df_alturas.to_csv(r"D:\Monitoreo 2026\Output\csv\Isla del Cerrito\Alturas", index=False)
+
+#print(df_alturas.dtypes) # Para verificar si la columna fecha, es tipo datetime64. Para trabajar como fechas dentro de python y no como objeto o texto.
+
+```
+
+
+**Excel de Calidad del agua a csv - Isla del cerrito**
 
 ```{python}
 
@@ -502,8 +528,201 @@ convertir_xls_a_csv(carpeta_origen, carpeta_destino)
 
 ```
 
+Limpieza y arreglo de csv del SNIH
 
+**ph**
+
+```{python}
+import pandas as pd
+
+df_ph = pd.read_csv(r"D:\Monitoreo 2026\Input\csv\Isla del Cerrito\Historicos-Estacion 2406 - ph.csv")
+
+df_ph['Fecha y Hora'] = pd.to_datetime(df_ph['Fecha y Hora'], dayfirst=True, errors='coerce')
+
+
+df_ph.to_csv(r"D:\Monitoreo 2026\Output\csv\Isla del Cerrito\pH", index=False)
+print(df_ph.head(15))
+ 
+
+#print(df_ph.dtypes) # Para verificar si la columna fecha, es tipo datetime64. Para trabajar como fechas dentro de python y no como objeto o texto.
+
+```
+
+**Conductividad**
+
+```{python}
+import pandas as pd
+
+df_cond = pd.read_csv(r"D:\Monitoreo 2026\Input\csv\Isla del Cerrito\Historicos-Estacion 2406 - conductividad.csv")
+
+df_cond['Fecha y Hora'] = pd.to_datetime(df_cond['Fecha y Hora'], dayfirst=True, errors='coerce')
+
+
+df_cond.to_csv(r"D:\Monitoreo 2026\Output\csv\Isla del Cerrito\Conductividad", index=False)
+#print(df_cond.head(15))
+ 
+
+#print(df_cond.dtypes) # Para verificar si la columna fecha, es tipo datetime64. Para trabajar como fechas dentro de python y no como objeto o texto.
+```
+
+**Sólidos disueltos totales**
+
+```{python}
+import pandas as pd
+
+df_sdt = pd.read_csv(r"D:\Monitoreo 2026\Input\csv\Isla del Cerrito\Historicos-Estacion 2406 - solidos disueltos totales.csv")
+
+df_sdt['Fecha y Hora'] = pd.to_datetime(df_sdt['Fecha y Hora'], dayfirst=True, errors='coerce')
+
+df_sdt.to_csv(r"D:\Monitoreo 2026\Output\csv\Isla del Cerrito\Sólidos disueltos totales", index=False)
+
+print(df_sdt.head(15))
+ 
+#print(df_sdt.dtypes) # Para verificar si la columna fecha, es tipo datetime64. Para trabajar como fechas dentro de python y no como objeto o texto.
+```
+
+**Turbidez**
+
+```{python}
+
+import pandas as pd
+
+df_turb = pd.read_csv(r"D:\Monitoreo 2026\Input\csv\Isla del Cerrito\Historicos-Estacion 2406 - turbidez.csv")
+
+df_turb['Fecha y Hora'] = pd.to_datetime(df_turb['Fecha y Hora'], dayfirst=True, errors='coerce')
+
+#df_turb.to_csv(r"D:\Monitoreo 2026\Output\csv\Isla del Cerrito\Turbidez", index=False)
+
+print(df_turb)
+ 
+print(df_turb.dtypes) # Para verificar si la columna fecha, es tipo datetime64. Para trabajar como fechas dentro de python y no como objeto o texto.
+
+```
 
 # Barranqueras
 
 
+**Limpieza CSV INA - Altura Barranqueras**
+
+```{python}
+import pandas as pd
+
+df_alturas= pd.read_csv(r"D:\Monitoreo 2026\Base de datos\Alturas INA\Alturas_Barranqueras.csv")
+
+df_alturas = df_alturas.rename(columns={'timestart': 'Fecha y Hora','valor': 'altura'})
+df_alturas = df_alturas.drop(columns=['obs_id', 'timeend', 'obs_id','timeupdate'])
+df_alturas['Fecha y Hora'] = pd.to_datetime(df_alturas['Fecha y Hora'])
+
+print(df_alturas.head(25))
+df_alturas.to_csv(r"D:\Monitoreo 2026\Output\csv\Barranqueras\Alturas", index=False)
+
+print(df_alturas.dtypes) # Para verificar si la columna fecha, es tipo datetime64. Para trabajar como fechas dentro de python y no como objeto o texto.
+
+```
+
+**Limpieza CSV INA - Caudal Barranqueras**
+
+```{python}
+
+import pandas as pd
+
+df_caudales = pd.read_csv(r"D:\Monitoreo 2026\Base de datos\Caudal INA\Caudal_Barranqueras.csv")
+
+df_caudales = df_caudales.rename(columns={'timestart': 'Fecha y Hora','valor': 'caudal'})
+df_caudales = df_caudales.drop(columns=['obs_id', 'timeend', 'obs_id','timeupdate'])
+df_caudales['Fecha y Hora'] = pd.to_datetime(df_caudales['Fecha y Hora'])
+#df_caudales['día'] = df_caudales['Fecha y Hora'].dt.date
+
+df_caudales.head()
+df_caudales.to_csv(r"D:\Monitoreo 2026\Output\csv\Barranqueras\Caudales", index=False)
+
+#print(df_alturas.dtypes)
+
+```
+
+
+
+
+
+
+
+# Graficador plotly - para alturas
+
+```{python}
+## Variación de la Altura a lo Largo del Tiempo
+
+import pandas as pd
+import plotly.express as px
+
+# Cargar datos (ajusta la ruta si es necesario)
+df = pd.read_csv("D:/Monitoreo 2026/Output/csv/Corrientes/Alturas")
+df['Fecha y Hora'] = pd.to_datetime(df['Fecha y Hora'])
+
+# Crear y mostrar el gráfico directamente
+fig = px.line(df, x='Fecha y Hora', y='altura', 
+              title='Variación de la Altura a lo Largo del Tiempo',
+              labels={'Fecha y Hora': 'Fecha', 'altura': 'Altura (m)'},
+              markers=True)
+fig.show() # Esta línea es clave para que Quarto lo muestre   
+```
+
+
+
+# Datos SAMEEP 2017-2021
+
+archivo excel a csv
+
+```{python}
+import pandas as pd
+import os
+from pathlib import Path
+
+def convertir_xls_a_csv(carpeta_entrada, carpeta_salida):
+    """
+    Convierte todos los archivos .xls y .xlsx de 'carpeta_entrada' 
+    y los guarda en 'carpeta_salida'.
+    """
+    ruta_entrada = Path(carpeta_entrada)
+    
+    # 1. Asegurar que la carpeta de destino exista
+    ruta_salida = Path(carpeta_salida)
+    ruta_salida.mkdir(parents=True, exist_ok=True)
+    
+    # Buscar archivos
+    archivos = list(ruta_entrada.glob("*.xls")) + list(ruta_entrada.glob("*.xlsx"))
+    
+    if not archivos:
+        print(f"⚠️ No se encontraron archivos .xls o .xlsx en: {carpeta_entrada}")
+        return
+
+    print(f"🔄 Encontrados {len(archivos)} archivos. Iniciando conversión a: {carpeta_salida}...")
+
+    for archivo in archivos:
+        try:
+            # Leer el Excel
+            df = pd.read_excel(archivo)
+            
+            # 2. CAMBIO CLAVE: Crear la ruta completa en la carpeta de destino
+            nombre_salida = ruta_salida / archivo.name
+            # Si quieres cambiar la extensión a .csv explícitamente:
+            nombre_salida = nombre_salida.with_suffix('.csv')
+            
+            # Guardar como CSV
+            df.to_csv(nombre_salida, index=False, encoding='utf-8-sig')
+            
+            print(f"✅ {archivo.name} -> {nombre_salida.name}")
+            
+        except Exception as e:
+            print(f"❌ Error al convertir {archivo.name}: {e}")
+
+    print(f"\n🎉 ¡Todo listo! Archivos guardados en: {carpeta_salida}")
+
+# --- CONFIGURACIÓN ---
+carpeta_origen = r"D:\Monitoreo 2026\Input\xlsx"  # Donde están los .xls
+carpeta_destino = r"D:\Monitoreo 2026\Output\csv\SAMEEP 2017-2021"    # Donde quieres los .csv
+
+# Ejecutar
+convertir_xls_a_csv(carpeta_origen, carpeta_destino)
+
+
+```

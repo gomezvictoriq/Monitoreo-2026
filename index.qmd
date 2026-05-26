@@ -1,14 +1,13 @@
 ---
 title: "Monitoreo 2026"
 
-
 freeze: auto
-
 
 format: 
   html:
     number-sections: true
     toc: true
+    toc-width: "5%"
     toc-location: left
     embed-resources: false
     crossrefs-hover: false
@@ -45,24 +44,24 @@ keywords:
 
 # Relevamiento de estaciones hidrológicas
 
-En Argentina, el monitoreo y estudio de los recursos hídricos está a cargo de organismos nacionales y provinciales, destacándose el Instituto Nacional del Agua (INA) y la Subsecretaría de Recursos Hídricos.
+En Argentina, el monitoreo y estudio de los recursos hídricos está a cargo de organismos nacionales y provinciales, destacándose el Instituto Nacional del Agua (INA) y la Subsecretaría de Recursos Hídricos. En nuestro país hay varias redes de monitoreo.
 
-En Argentina hay varias redes de monitoreo.
-
-La red principal de monitoreo es la Red Hidrológica Nacional (RHN) es la mayor fuente de información:
-hidrológica (altura y caudal de los ríos); meteorológica (lluvia, evaporación, temperatura, humedad, presión atmosférica, velocidad/dirección del viento, radiación solar); nivológica (equivalente de agua en nieve); y de calidad de agua del país.
+La red principal de monitoreo es la Red Hidrológica Nacional (RHN), es la mayor fuente de información:
+- hidrológica (altura y caudal de los ríos); 
+- meteorológica (lluvia, evaporación, temperatura, humedad, presión atmosférica, velocidad/dirección del viento, radiación solar); nivológica (equivalente de agua en nieve); 
+- y de calidad de agua del país.
 
 Algunas redes que están adheridas a la RHN son:
 
-• Red SiNaRaME (Sistema Nacional de Radares Meteorológicos)
+- Red SiNaRaME (Sistema Nacional de Radares Meteorológicos)
 
-• Red Hidrológica COREBE (Comisión Regional del Río Bermejo)
+- Red Hidrológica COREBE (Comisión Regional del Río Bermejo)
 
-• Red Hidrológica CIRHBAS (Comité Interjurisdiccional de la Región Hídrica de los Bajos Submeridionales)
+- Red Hidrológica CIRHBAS (Comité Interjurisdiccional de la Región Hídrica de los Bajos Submeridionales)
 
-• Red Meteorológica RMET
+- Red Meteorológica RMET
 
-• Red Hidrológica CIRHNOP
+- Red Hidrológica CIRHNOP
 
 La Subsecretaria de Recursos Hídricos, organismo encargado de gestionar la infraestructura de medición y la base de batos hidrológica integrada.
 
@@ -79,117 +78,113 @@ El Sistema Nacional de Información Hídrica (SNIH), tiene el objetivo de recole
 El SIyAH (Sistema de Información y Alerta Hidrológico) que monitorea en tiempo real el comportamiento de los ríos, especialmente en la Cuenca del Plata.
 Operado por el Instituto Nacional del Agua (INA), es un servicio técnico y científico encargado de monitorear, diagnosticar y pronosticar el comportamiento de los ríos Paraná, Paraguay, Uruguay e Iguazú.
 Provee datos clave para prevenir inundaciones y sequías, siendo fundamental para la gestión hídrica
-En el [Sitio del INA](https://alerta.ina.gob.ar/pub/mapa)
-Se puede consultar los distintos tipos de estaciones, se pueden aplicar filtros para buscar por red de preferencia, tipos de estaciones, etc.
+En el [sitio web del INA](https://alerta.ina.gob.ar/pub/mapa)
+se puede consultar los distintos tipos de estaciones, se pueden aplicar filtros para buscar por red de preferencia, tipos de estaciones, etc. 
 
+El INA ofrece una [API](https://alerta.ina.gob.ar/pub/gui/datos&auto=true&seriesId=19&timeEnd=2026-04-28T00:00:00) para acceder a datos hidrológicos en formatos como JSON o CSV, en donde se debe indicar **siteCode** y **varId** (Estación y variable respectivamente) de interés. En @tbl-id-variablesINA y en @tbl-id-estacionesINA, se muestran los identificadores de variables y estaciones utilizadas en este trabajo.
 
-**Tabla de variables hidrológicas**
 
 | Identificadores de variables INA |
 |----------------------------------|
 | 2 - Altura                       |
 | 4 - Caudales                     |
+: **Tabla de variables hidrológicas** {#tbl-id-variablesINA}
 
-**Tabla de estaciones consultadas**
 
 | Identificadores de estaciones INA |
 |-----------------------------------|
 | 19 - Corrientes                   |
 | 20 - Barranqueras                 |
 | 59 - Isla del Cerrito             |
-| 2115 - Paraná Corrientes          |
-| 6449 - Paraguay Isla del Cerrito  |
+
+: **Tabla de estaciones consultadas** {#tbl-id-estacionesINA}
 
 Dentro de la zona de interés en este proyecto, los datos de caudales sólo estan disponibles para las estaciones Barranqueras y Corrientes del sitio web del INA.
 
+## Base de DATOS SAMEEP 2017-2021
+
+Actualmente no contamos una la base de datos actualizada de las plantas potabilizadoras de SAMMEP y de Aguas de Corrientes, por lo que de momento trabajamos con una base de datos de un proyecto anterior, con el fin de ir conociendo más funciones en Python y ganar práctica en este leguaje de programación.
 
 # Estación Corrientes
 
+## Altura
+
+Los datos de altura están disponibles desde 02/01/1901
+
 **Evolución de alturas a lo largo de los años**
 
-Usando plotly
-
-<div style="width: 100%; overflow-x: auto;">
-  <iframe 
-    src="grafica.html" 
-    style="width: 1200px; height: 600px; border: none;"
-    scrolling="no"
-    sandbox="allow-scripts allow-same-origin">
-  </iframe>
-</div>
+Usamos la librería **plotly**.
 
 ```{python}
-
 #| code-fold: true
 
 import pandas as pd
 import plotly.express as px
-from io import StringIO
 
 # Cargar datos
-df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\Alturas")
-
-# Convertir la columna de fecha a tipo datetime
+df = pd.read_csv(r"D:/Monitoreo 2026/Output/csv/Corrientes/Alturas")
 df['Fecha y Hora'] = pd.to_datetime(df['Fecha y Hora'])
 
-# Crear la gráfica interactiva
+# Crear gráfico
 fig = px.line(df, x='Fecha y Hora', y='altura', 
-              title='Variación de la Altura a lo Largo del Tiempo',
-              labels={'Fecha y Hora': 'Fecha', 'altura': 'Altura (m)'},
-              markers=True)
+              title='Variación de la altura a lo largo del Tiempo',
+              labels={'Fecha y Hora': 'Años', 'altura': 'Altura (m)'},
+              markers=True,
+              template='plotly_white')
 
-# Personalizar la gráfica
-fig.update_traces(line=dict(width=3, color='royalblue'),
-                  marker=dict(size=8, symbol='circle', line=dict(width=2, color='white')))
+# Perzonalización
 
-# CONFIGURACIÓN DE LAYOUT CORREGIDA (Indentación fija + autosize)
-fig.update_layout(
-    hovermode='x unified',
-    template='plotly_white',
-    xaxis=dict(tickformat='%Y-%m-%d', tickangle=45),
-    yaxis=dict(title='Altura (metros)'),
-    autosize=True,  # Permite que se ajuste al contenedor
-    margin=dict(l=50, r=50, t=80, b=50)
-)
+fig.add_hline(y=7, line_dash="dash", line_color="red", annotation_text="Nivel de evacuación (7 m)")   
 
-# Agregar anotaciones para valores extremos
-min_idx = df['altura'].idxmin()
-max_idx = df['altura'].idxmax()
+#fig.update_traces(line=dict(width=3, color='royalblue'),
+                 # marker=dict(size=8, 
+                 # symbol='circle', 
+                 # line=dict(width=2, 
+                 # color='white'))
+                 # )
 
-fig.add_annotation(
-    x=df.loc[min_idx, 'Fecha y Hora'],
-    y=df.loc[min_idx, 'altura'],
-    text=f"Mínimo: {df.loc[min_idx, 'altura']}m",
-    showarrow=True,
-    arrowhead=2,
-    arrowsize=1,
-    arrowwidth=2,
-    arrowcolor='red'
-)
-
-fig.add_annotation(
-    x=df.loc[max_idx, 'Fecha y Hora'],
-    y=df.loc[max_idx, 'altura'],
-    text=f"Máximo: {df.loc[max_idx, 'altura']}m",
-    showarrow=True,
-    arrowhead=2,
-    arrowsize=1,
-    arrowwidth=2,
-    arrowcolor='green'
-)
-
-# Guardar la gráfica como un archivo HTML con dimensiones correctas
-fig.write_html(
-    "grafica.html",
-    include_plotlyjs='cdn',
-    full_html=True,
-    default_width='100%',
-    default_height='600px'
-)
+fig.show()
 ```
 
+**Evolución del caudal a lo largo de los años**
 
-**Altura vs pH**
+
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import plotly.express as px
+
+# Cargar datos
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\Caudales")
+df['Fecha y Hora'] = pd.to_datetime(df['Fecha y Hora'])
+
+# Crear gráfico
+fig = px.line(df, x='Fecha y Hora', y='caudal', 
+              title='Variación del caudal a lo largo del Tiempo',
+              labels={'Fecha y Hora': 'Años', 'altura': 'Caudal (m^3/s)'},
+              markers=True,
+              template='plotly_white')
+
+# Perzonalización
+
+#fig.update_traces(line=dict(width=3, color='royalblue'),
+                 # marker=dict(size=8, 
+                 # symbol='circle', 
+                 # line=dict(width=2, 
+                 # color='white'))
+                 # )
+
+fig.show()
+
+```
+
+A continuación se cálcula la correlación **r** entre ph, turbidez y conductividad respectivamente con la altura.
+
+## pH
+
+**Cálculo de correlación**
 
 ```{python}
 #| code-fold: true
@@ -219,7 +214,7 @@ df_fusionado = pd.merge_asof(
 
 # 4. Limpiar nombres de columnas si es necesario
 # Ahora tendrás: Fecha y Hora, Conductividad, altura, día (de la tabla de alturas)
-print(df_fusionado)
+#print(df_fusionado)
 
 # Correlación
 
@@ -240,7 +235,8 @@ print(f"Coeficiente de correlación (r): {r:.4f}")
 
 ```
 
-Correlación pH vs Altura
+**Gráfico de Correlación pH vs Altura**
+
 ```{python} 
 #| code-fold: true
 
@@ -318,9 +314,9 @@ else:
 
 ```
 
+## Turbidez
 
-**altura vs turbidez**
-
+**Cálculo de correlación**
 
 ```{python}
 #| code-fold: true
@@ -371,8 +367,7 @@ print(f"Coeficiente de correlación (r): {r:.4f}")
 
 ```
 
-
-**Correlación Turbidez vs Altura**
+**Grafico de Correlación Turbidez vs Altura**
 
 ```{python}
 #| code-fold: true
@@ -402,8 +397,6 @@ else:
 
     # Eliminar filas con NaN (datos faltantes) para el cálculo y gráfico
     df_limpio = df_fusionado.dropna(subset=[col_turb, col_alt])
-
-
 
     # ==========================================
     # 2. CÁLCULO DE CORRELACIÓN
@@ -448,8 +441,774 @@ else:
 
     plt.tight_layout()
     plt.show()
+```
+
+## Conductividad
+
+**Cálculo de correlación**
+```{python}
+
+#| code-fold: true
+
+import pandas as pd
+
+df_alturas = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\Alturas")
+df_cond = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\conductividad")
+
+# 1. Asegurarse de que las columnas de fecha sean datetime (ya lo están según tu output)
+# Pero por seguridad, forzamos el formato si hubiera dudas
+df_cond['Fecha y Hora'] = pd.to_datetime(df_cond['Fecha y Hora'])
+df_alturas['Fecha y Hora'] = pd.to_datetime(df_alturas['Fecha y Hora'])
+
+# 2. IMPORTANTE: Ordenar ambos DataFrames por la columna de fecha
+# merge_asof REQUERIR que los datos estén ordenados cronológicamente
+df_cond = df_cond.sort_values('Fecha y Hora')
+df_alturas = df_alturas.sort_values('Fecha y Hora')
+
+# 3. Realizar la fusión con merge_asof
+df_fusionado = pd.merge_asof(
+    df_cond,       # Tabla principal (la que tiene muchas filas)
+    df_alturas,             # Tabla de referencia (la que tiene 1 altura por día)
+    on='Fecha y Hora',      # Columna de tiempo común
+    direction='backward'    # 'backward': Toma la altura más reciente ANTES de la hora de la medición química.
+                            # Esto es ideal: Si midiste pH a las 12:00, toma la altura de las 07:00.
+)
+
+# 4. Limpiar nombres de columnas si es necesario
+# Ahora tendrás: Fecha y Hora, Conductividad, altura, día (de la tabla de alturas)
+print(df_fusionado)
+
+# Correlación
+
+# Asegúrate de que las columnas sean numéricas (a veces vienen como texto por errores de lectura)
+# Tu DataFrame se llama df_fusionado (o el nombre que le diste)
+df_fusionado['Conductividad Específica a 25ºC [uS/cm]'] = pd.to_numeric(df_fusionado['Conductividad Específica a 25ºC [uS/cm]'], errors='coerce')
+df_fusionado['altura'] = pd.to_numeric(df_fusionado['altura'], errors='coerce')
+
+# Eliminar filas donde falten datos en cualquiera de las dos columnas
+# (La correlación no se puede calcular con valores NaN)
+df_limpio = df_fusionado.dropna(subset=['Conductividad Específica a 25ºC [uS/cm]', 'altura'])
+
+# Calcular la correlación
+r = df_limpio['Conductividad Específica a 25ºC [uS/cm]'].corr(df_limpio['altura'])
+
+print(f"Coeficiente de correlación (r): {r:.4f}")
+```
+
+**Grafico de correlación Conductividad vs altura**
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+# ==========================================
+# 1. PREPARACIÓN DE DATOS
+# ==========================================
+# Asumiendo que tu dataframe fusionado se llama 'df_fusionado'
+# Si lo guardaste en una variable diferente, cambia el nombre aquí.
+
+# 1.1 Aseguramos que sean numéricas
+col_cond = 'Conductividad Específica a 25ºC [uS/cm]'  # Ajusta este nombre si tu columna se llama diferente
+col_alt = 'altura'           # Ajusta este nombre si tu columna se llama diferente
+
+# Verificar si las columnas existen (para evitar errores)
+if col_cond not in df_fusionado.columns or col_alt not in df_fusionado.columns:
+    print(" Error: No se encontraron las columnas 'Conductividad Específica a 25ºC [uS/cm]' o 'altura'.")
+    print(f"Columnas disponibles: {df_fusionado.columns.tolist()}")
+else:
+    # Convertir a numérico (descartando textos o errores)
+    df_fusionado[col_cond] = pd.to_numeric(df_fusionado[col_cond], errors='coerce')
+    df_fusionado[col_alt] = pd.to_numeric(df_fusionado[col_alt], errors='coerce')
+
+    # Eliminar filas con NaN (datos faltantes) para el cálculo y gráfico
+    df_limpio = df_fusionado.dropna(subset=[col_cond, col_alt])
+
+
+
+    # ==========================================
+    # 2. CÁLCULO DE CORRELACIÓN
+    # ==========================================
+    if len(df_limpio) > 0:
+        r = df_limpio[col_cond].corr(df_limpio[col_alt])
+        print(f"\n📊 Coeficiente de Correlación (r): {r:.4f}")
+    else:
+        r = 0
+        print("\n⚠️ No hay datos suficientes para calcular la correlación.")
+
+    # ==========================================
+    # 3. GENERAR GRÁFICO
+    # ==========================================
+    plt.style.use('seaborn-v0_8-whitegrid') # Estilo limpio
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Crear el scatter plot
+    # s=40: tamaño de los puntos
+    # alpha=0.6: transparencia para ver superposiciones
+    scatter = ax.scatter(df_limpio[col_alt], df_limpio[col_cond], 
+                         color='#1f77b4', alpha=0.6, edgecolors='w', s=50, label='Datos Medidos')
+
+    # Opcional: Añadir una línea de tendencia (Regresión lineal)
+    if len(df_limpio) > 1:
+        # Calcular pendiente e intersección
+        m, b = np.polyfit(df_limpio[col_alt], df_limpio[col_cond], 1)
+        # Dibujar la línea
+        x_line = np.linspace(df_limpio[col_alt].min(), df_limpio[col_alt].max(), 100)
+        ax.plot(x_line, m * x_line + b, color='#d62728', linewidth=2, label=f'Tendencia (r={r:.2f})')
+
+    # Configuración de etiquetas y título
+    ax.set_xlabel(f'Altura del Río ({col_alt})', fontsize=12)
+    ax.set_ylabel(f'Conductividad', fontsize=12)
+    ax.set_title(f'Relación: Conductividad vs. Altura\n(Coeficiente de Pearson r = {r:.3f})', fontsize=14, fontweight='bold')
+    ax.legend()
+
+    # Limitar ejes si hay valores extremos (outliers) que rompen la escala
+    # Esto ayuda a ver mejor la mayoría de los puntos
+    # ax.set_xlim(left=0) # Si la altura no puede ser negativa
+    # ax.set_ylim(bottom=0) # Si la turbidez no puede ser negativa
+
+    plt.tight_layout()
+    plt.show()
 
 ```
 
+
+
+## Histogramas
+
+**Alturas [m]**
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df_alturras_corr = pd.read_csv(r"Output/csv/Corrientes/Alturas")
+
+
+media = df_alturras_corr['altura'].mean()
+mediana = df_alturras_corr['altura'].median()
+moda = df_alturras_corr['altura'].mode()[0]    
+
+df_alturras_corr.head()
+
+df_alturras_corr['altura'].hist(bins=10, color='skyblue', edgecolor='black')
+
+
+plt.axvline(media, color='red', linestyle='dashed', linewidth=2, label=f'Media: {media:.2f}')
+plt.axvline(mediana, color='green', linestyle='dashed', linewidth=2, label=f'Mediana: {mediana:.2f}')
+plt.axvline(moda, color='purple', linestyle='dashed', linewidth=2, label=f'Moda: {moda:.2f}')
+plt.legend()
+
+
+
+
+plt.title('Histograma: Alturas Corrientes 1901-2026')
+
+
+plt.show()
+
+
+```
+
+**Caudales [m^3^/s]**
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df_caudales_corr = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\Caudales")
+
+
+media = df_caudales_corr['caudal'].mean()
+mediana = df_caudales_corr['caudal'].median()
+moda = df_caudales_corr['caudal'].mode()[0]    
+
+df_caudales_corr.head()
+
+df_caudales_corr['caudal'].hist(bins=10, color='skyblue', edgecolor='black')
+
+
+plt.axvline(media, color='red', linestyle='dashed', linewidth=2, label=f'Media: {media:.2f}')
+plt.axvline(mediana, color='green', linestyle='dashed', linewidth=2, label=f'Mediana: {mediana:.2f}')
+plt.axvline(moda, color='purple', linestyle='dashed', linewidth=2, label=f'Moda: {moda:.2f}')
+plt.legend()
+
+
+plt.title('Histograma: Caudales Corrientes 1910-2026')
+
+plt.show()
+
+```
+
+**pH**
+
+```{python}
+#| code-fold: true
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df_ph_corr = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\pH")
+
+
+media = df_ph_corr['pH [UpH]'].mean()
+mediana = df_ph_corr['pH [UpH]'].median()
+moda = df_ph_corr['pH [UpH]'].mode()[0]       
+
+df_ph_corr.head()
+
+df_ph_corr['pH [UpH]'].hist(bins=4, color='skyblue', edgecolor='black')
+
+
+plt.axvline(media, color='red', linestyle='dashed', linewidth=2, label=f'Media: {media:.2f}')
+plt.axvline(mediana, color='green', linestyle='dashed', linewidth=2, label=f'Mediana: {mediana:.2f}')
+plt.axvline(moda, color='purple', linestyle='dashed', linewidth=2, label=f'Moda: {moda:.2f}')
+plt.legend()
+
+
+plt.title('Histograma: ph Corrientes')
+
+plt.show()
+
+```
+
+**Turbidez**
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df_ph_corr = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\turbidez")
+
+
+media = df_ph_corr['TURBIDEZ [NTU]'].mean()
+mediana = df_ph_corr['TURBIDEZ [NTU]'].median()
+moda = df_ph_corr['TURBIDEZ [NTU]'].mode()[0]    
+
+df_ph_corr.head()
+
+df_ph_corr['TURBIDEZ [NTU]'].hist(bins=4, color='skyblue', edgecolor='black')
+
+
+plt.axvline(media, color='red', linestyle='dashed', linewidth=2, label=f'Media: {media:.2f}')
+plt.axvline(mediana, color='green', linestyle='dashed', linewidth=2, label=f'Mediana: {mediana:.2f}')
+plt.axvline(moda, color='purple', linestyle='dashed', linewidth=2, label=f'Moda: {moda:.2f}')
+plt.legend()
+
+
+plt.title('Histograma: Turbidez 2011-2014')
+
+plt.show()
+
+```
+
+**Conductividad**
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df_cond_corr = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Corrientes\conductividad")
+
+
+media = df_cond_corr['Conductividad Específica a 25ºC [uS/cm]'].mean()
+mediana = df_cond_corr['Conductividad Específica a 25ºC [uS/cm]'].median()
+moda = df_cond_corr['Conductividad Específica a 25ºC [uS/cm]'].mode()[0]    
+
+df_cond_corr.head()
+
+df_cond_corr['Conductividad Específica a 25ºC [uS/cm]'].hist(bins=4, color='skyblue', edgecolor='black')
+
+
+plt.axvline(media, color='red', linestyle='dashed', linewidth=2, label=f'Media: {media:.2f}')
+plt.axvline(mediana, color='green', linestyle='dashed', linewidth=2, label=f'Mediana: {mediana:.2f}')
+plt.axvline(moda, color='purple', linestyle='dashed', linewidth=2, label=f'Moda: {moda:.2f}')
+plt.legend()
+
+
+plt.title('Histograma: Conductividad 2011-2018')
+
+plt.show()
+
+```
+
+
+
+# Estación Isla del Cerrito 
+
+## Altura
+
+Los datos de altura están disponibles desde 01/05/2012.
+
+Evolución de alturas a lo largo de los años.
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import plotly.express as px
+
+# Cargar datos
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Isla del Cerrito\Alturas")
+df['Fecha y Hora'] = pd.to_datetime(df['Fecha y Hora'])
+
+# Crear gráfico
+fig = px.line(df, x='Fecha y Hora', y='altura', 
+              title='Variación de la altura a lo largo del Tiempo',
+              labels={'Fecha y Hora': 'Años', 'altura': 'Altura (m)'},
+              markers=True,
+              template='plotly_white')
+
+# Perzonalización
+
+fig.add_hline(y=6.8, line_dash="dash", line_color="red", annotation_text="Nivel de evacuación (6,8 m)")   
+
+#fig.update_traces(line=dict(width=3, color='royalblue'),
+                 # marker=dict(size=8, 
+                 # symbol='circle', 
+                 # line=dict(width=2, 
+                 # color='white'))
+                 # )
+
+fig.show()
+
+```
+
+## Turbidez 
+
+Valores superiores a 1000 NTU están fuera del rango detectable y se reportan como ≥1000 NTU."
+
+
+## Histogramas
+
+**Alturas [m]**
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df_alturras_cerr = pd.read_csv(r"Output/csv/Corrientes/Alturas")
+
+
+media = df_alturras_cerr['altura'].mean()
+mediana = df_alturras_cerr['altura'].median()
+moda = df_alturras_cerr['altura'].mode()[0]    
+
+df_alturras_cerr.head()
+
+df_alturras_cerr['altura'].hist(bins=10, color='skyblue', edgecolor='black')
+
+
+plt.axvline(media, color='red', linestyle='dashed', linewidth=2, label=f'Media: {media:.2f}')
+plt.axvline(mediana, color='green', linestyle='dashed', linewidth=2, label=f'Mediana: {mediana:.2f}')
+plt.axvline(moda, color='purple', linestyle='dashed', linewidth=2, label=f'Moda: {moda:.2f}')
+plt.legend()
+
+
+plt.title('Histograma: Alturas Isla del Cerrito 2012-2026')
+
+
+plt.show()
+
+```
+
+**pH**
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df_ph_cerr = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Isla del Cerrito\pH")
+
+
+media = df_ph_cerr['pH [UpH]'].mean()
+mediana = df_ph_cerr['pH [UpH]'].median()
+moda = df_ph_cerr['pH [UpH]'].mode()[0]       
+
+df_ph_cerr.head()
+
+df_ph_cerr['pH [UpH]'].hist(bins=10, color='skyblue', edgecolor='black')
+
+
+plt.axvline(media, color='red', linestyle='dashed', linewidth=2, label=f'Media: {media:.2f}')
+plt.axvline(mediana, color='green', linestyle='dashed', linewidth=2, label=f'Mediana: {mediana:.2f}')
+plt.axvline(moda, color='purple', linestyle='dashed', linewidth=2, label=f'Moda: {moda:.2f}')
+plt.legend()
+
+
+plt.title('Histograma: ph - Isla del Cerrito 2018-2024')
+
+plt.show()
+
+```
+
+
+**Turbidez**
+
+Valores superiores a 1000 NTU están fuera del rango detectable y se reportan como ≥1000 NTU."
+
+```{python}
+
+#| code-fold: true
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df_turb_cerr = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Isla del Cerrito\Turbidez")
+
+
+media = df_turb_cerr['TURBIDEZ [NTU]'].mean()
+mediana = df_turb_cerr['TURBIDEZ [NTU]'].median()
+moda = df_turb_cerr['TURBIDEZ [NTU]'].mode()[0]       
+
+df_turb_cerr.head()
+
+df_turb_cerr['TURBIDEZ [NTU]'].hist(bins=4, color='skyblue', edgecolor='black')
+
+
+plt.axvline(media, color='red', linestyle='dashed', linewidth=2, label=f'Media: {media:.2f}')
+plt.axvline(mediana, color='green', linestyle='dashed', linewidth=2, label=f'Mediana: {mediana:.2f}')
+plt.axvline(moda, color='purple', linestyle='dashed', linewidth=2, label=f'Moda: {moda:.2f}')
+plt.legend()
+
+
+plt.title('Histograma: Turbidez - Isla del Cerrito')
+
+plt.show()
+
+
+```
+
+
+**Conductividad**
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df_cond_cerr = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Isla del Cerrito\Conductividad")
+
+
+media = df_cond_cerr['Conductividad Específica a 25ºC [uS/cm]'].mean()
+mediana = df_cond_cerr['Conductividad Específica a 25ºC [uS/cm]'].median()
+moda = df_cond_cerr['Conductividad Específica a 25ºC [uS/cm]'].mode()[0]       
+
+df_cond_cerr.head()
+
+df_cond_cerr['Conductividad Específica a 25ºC [uS/cm]'].hist(bins=10, color='skyblue', edgecolor='black')
+
+
+plt.axvline(media, color='red', linestyle='dashed', linewidth=2, label=f'Media: {media:.2f}')
+plt.axvline(mediana, color='green', linestyle='dashed', linewidth=2, label=f'Mediana: {mediana:.2f}')
+plt.axvline(moda, color='purple', linestyle='dashed', linewidth=2, label=f'Moda: {moda:.2f}')
+plt.legend()
+
+
+plt.title('Histograma: Conductividad - Isla del Cerrito')
+
+plt.show()
+
+```
+
+# Barranqueras - SAMEEP (2017-2019)
+
+Los datos de altura están disponibles desde 02/03/1906.
+
+**Evolución de la altura a lo largo de los años**
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import plotly.express as px
+
+# Cargar datos
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Barranqueras\Alturas")
+df['Fecha y Hora'] = pd.to_datetime(df['Fecha y Hora'])
+
+# Crear gráfico
+fig = px.line(df, x='Fecha y Hora', y='altura', 
+              title='Variación de la altura a lo largo del Tiempo',
+              labels={'Fecha y Hora': 'Años', 'altura': 'Altura (m)'},
+              markers=True,
+              template='plotly_white')
+
+# Perzonalización
+
+fig.add_hline(y=6.5, line_dash="dash", line_color="red", annotation_text="Nivel de evacuación (6,5 m)")   
+
+#fig.update_traces(line=dict(width=3, color='royalblue'),
+                 # marker=dict(size=8, 
+                 # symbol='circle', 
+                 # line=dict(width=2, 
+                 # color='white'))
+                 # )
+
+fig.show()
+
+
+
+```
+
+**Evolución del caudal a lo largo de los años**
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import plotly.express as px
+
+# Cargar datos
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Barranqueras\Caudales")
+df['Fecha y Hora'] = pd.to_datetime(df['Fecha y Hora'])
+
+# Crear gráfico
+fig = px.line(df, x='Fecha y Hora', y='caudal', 
+              title='Variación del caudal a lo largo del Tiempo',
+              labels={'Fecha y Hora': 'Años', 'altura': 'Caudal (m^3/s)'},
+              markers=True,
+              template='plotly_white')
+
+# Perzonalización
+
+#fig.update_traces(line=dict(width=3, color='royalblue'),
+                 # marker=dict(size=8, 
+                 # symbol='circle', 
+                 # line=dict(width=2, 
+                 # color='white'))
+                 # )
+
+fig.show()
+
+```
+
+
+## Histogramas
+
+**Alturas**
+
+```{python}
+#| code-fold: true
+#| label: fig-plot
+#| fig-cap: "Histrograma de alturas: Estación hidrológica Barranqueras"
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df_alturras_barr = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Barranqueras\Alturas")
+
+
+media = df_alturras_barr['altura'].mean()
+mediana = df_alturras_barr['altura'].median()
+moda = df_alturras_barr['altura'].mode()[0]    
+
+df_alturras_barr.head()
+
+df_alturras_barr['altura'].hist(bins=10, color='skyblue', edgecolor='black')
+
+
+plt.axvline(media, color='red', linestyle='dashed', linewidth=2, label=f'Media: {media:.2f}')
+plt.axvline(mediana, color='green', linestyle='dashed', linewidth=2, label=f'Mediana: {mediana:.2f}')
+plt.axvline(moda, color='purple', linestyle='dashed', linewidth=2, label=f'Moda: {moda:.2f}')
+plt.legend()
+
+
+plt.title('Histograma: Alturas Barranqueras 1906-2026')
+
+
+plt.show()
+
+```
+
+Como se puede observa en @fig-plot la mayoría de las mediaciones de altura en la estación hidrológica de Barranqueras se concentran entre los 2 y 5 metros de altura, presentandose con mayor frecuencia valores que rondan los 3 metros.
+La gráfica presenta una ligera cola hacia la derecha. Esto es típico en datos hidrológicos de ríos, donde la mayoría de los días el nivel es normal, pero existen eventos de crecida que elevan el nivel drásticamente.
+
+La media es ligeramente mayor a la mediana, debido a que ésta es influencia por valores altos extremos.
+
+**Caudal**
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df_caudales_ = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Barranqueras\Caudales")
+
+
+media = df_caudales_corr['caudal'].mean()
+mediana = df_caudales_corr['caudal'].median()
+moda = df_caudales_corr['caudal'].mode()[0]    
+
+df_caudales_corr.head()
+
+df_caudales_corr['caudal'].hist(bins=10, color='skyblue', edgecolor='black')
+
+
+plt.axvline(media, color='red', linestyle='dashed', linewidth=2, label=f'Media: {media:.2f}')
+plt.axvline(mediana, color='green', linestyle='dashed', linewidth=2, label=f'Mediana: {mediana:.2f}')
+plt.axvline(moda, color='purple', linestyle='dashed', linewidth=2, label=f'Moda: {moda:.2f}')
+plt.legend()
+
+
+plt.title('Histograma: Caudales Corrientes 1910-2026')
+
+plt.show()
+
+```
+
+
+# Serie temporales 
+
+Se utiliza la librería **statsmodels** en Python.
+
+## Turbidez SAMEEP 2017-2021
+
+```{python}
+#| code-fold: true
+
+# Importo funciones
+import pandas as pd
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose, STL
+
+# Lectura de datos
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\turb-2017-2021.csv")
+df['Fecha'] = pd.to_datetime(df['Fecha'])
+df = df.set_index('Fecha')
+#df.head()
+
+# Gráfico
+
+st = seasonal_decompose(df['turb'], model='additive', period=365)
+fig = st.plot()
+#fig.set_size_inches(12, 8) # para ajustar tamaño
+plt.tight_layout()
+plt.show()
+```
+
+En la , se indican 4 cruvas: observación, tendencia, ciclos y residuos respectivamente.
+
+
+## Conductividad SAMEEP 2017-2021
+
+```{python}
+#| code-fold: true
+
+# Importo funciones
+import pandas as pd
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose, STL
+
+# Lectura de datos
+df = pd.read_csv(r"Output/csv/Datos para series temporales/cond-2017-2021.csv")
+df['Fecha'] = pd.to_datetime(df['Fecha'])
+df = df.set_index('Fecha')
+
+# Gráfico
+
+st = seasonal_decompose(df['cond'], model='additive', period=365)
+fig = st.plot()
+#fig.set_size_inches(12, 8) # para ajustar tamaño
+plt.tight_layout()
+plt.show()
+```
+
+## Altura Estación Corrientes 2017-2026
+
+```{python}
+#| code-fold: true
+
+#| Lectura de datos
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose, STL
+
+df = pd.read_csv(r"Output/csv/Corrientes/Alturas")
+df = df[df['Fecha y Hora'] >= '2017-01-01']
+
+df['Fecha y Hora'] = pd.to_datetime(df['Fecha y Hora'])
+df = df.set_index('Fecha y Hora')
+#print(df.dtypes)
+
+# Grafico de serie temporal
+resultado = seasonal_decompose(df['altura'], model='additive', period=365)
+fig = resultado.plot()
+fig.set_size_inches(12, 8) # para ajustar tamaño
+plt.tight_layout()
+plt.show()
+```
+
+## Altura Barranqueras 2017-2026
+
+```{python}
+#| code-fold: true
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose, STL
+
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Barranqueras\Alturas")
+
+df = df[df['Fecha y Hora'] >= '2017-01-01']
+
+df['Fecha y Hora'] = pd.to_datetime(df['Fecha y Hora'])
+df = df.set_index('Fecha y Hora')
+#print(df.dtypes)
+
+#df.head()
+
+# Gráfico de serie temporal
+
+resultado = seasonal_decompose(df['altura'], model='additive', period=365)
+fig = resultado.plot()
+fig.set_size_inches(12, 8) # para ajustar tamaño
+plt.tight_layout()
+plt.show()
+```
+
+
+## Caudales Estación Barranqueras
+
+```{python}
+#| code-fold: true
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose, STL
+
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\Caudales_Barranqueras")
+
+df = df[df['Fecha y Hora'] >= '2017-01-01']
+
+df['Fecha y Hora'] = pd.to_datetime(df['Fecha y Hora'])
+df = df.set_index('Fecha y Hora')
+#print(df.dtypes)
+
+#df.head()
+
+# Gráfico de serie temporal
+
+resultado = seasonal_decompose(df['caudal'], model='additive', period=365)
+fig = resultado.plot()
+fig.set_size_inches(12, 8) # para ajustar tamaño
+plt.tight_layout()
+plt.show()
+```
 
 

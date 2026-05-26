@@ -1,0 +1,346 @@
+
+
+
+# Combinacion de Fecha y Hora en un sola columna
+
+```{python}
+df =pd.read_csv(r"D:\Monitoreo 2026\Output\csv\SAMEEP 2017-2021\SAMEEP 2017-2021.csv")
+
+df.head()
+```
+
+```{python}
+# 2. Combinar 'dia' y 'hora' en una sola cadena de texto
+# Si los nombres de las columnas son exactamente 'dia' y 'hora'
+df['fecha y hora'] = pd.to_datetime(df['dia'] + ' ' + df['hora'])
+
+# 3. (Opcional pero recomendado) Convertir a índice
+# Esto hace que las operaciones de tiempo sean muchísimo más rápidas y fáciles
+df.set_index('fecha y hora', inplace=True)
+
+df.drop(['dia', 'hora'], axis=1, inplace=True)
+
+# 4. Verificar que el tipo de dato es correcto
+print(f"Tipo de índice: {df.index.dtype}")
+print(df.head())
+
+df.to_csv(r"D:\Monitoreo 2026\Output\csv\SAMEEP 2017-2021\Datos-Sameep.csv", index=True)
+
+```
+
+
+# Preparación de datos turbidez 
+
+```{python}
+
+import pandas as pd
+
+df = pd.read_csv(r"Output/csv/SAMEEP 2017-2021/Datos-Sameep.csv")
+df['fecha y hora'] = pd.to_datetime(df['fecha y hora']) #para asegur que la columna sea datetime
+df.head()
+
+```
+
+Verifico si hay faltantes
+
+```{python}
+
+df_diario = df.groupby(df['fecha y hora'].dt.date)['turb'].mean().reset_index()
+
+# Cambio el nombre de la columna de fecha para trabajar cómodo
+df_diario = df_diario.rename(columns={'fecha y hora': 'fecha'})
+
+# Convierto de nuevo a datetime (ahora es fecha única por día) y poner en índice
+df_diario['fecha'] = pd.to_datetime(df_diario['fecha'])
+df_diario = df_diario.set_index('fecha').sort_index()
+
+print(df_diario)
+
+```
+
+Completo la serie temporal
+
+
+```{python}
+rango_completo = pd.date_range(start=df_diario.index.min(), end=df_diario.index.max(), freq='D')
+
+# Reindexar y rellenar (ej: con promedio anterior o interpolación)
+df_completo = df_diario.reindex(rango_completo)
+df_completo = df_completo.interpolate()
+
+print("\nSerie temporal completa (sin huecos):")
+print(df_completo)
+
+df_completo.to_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\turb-2017-2021.csv", index=True)
+
+```
+
+Serie temporal
+
+importamos funciones
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose, STL
+from statsmodels.tsa.stattools import adfuller
+```
+
+Lectura de datos
+
+
+```{python}
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\turb-2017-2021.csv")
+df['Fecha'] = pd.to_datetime(df['Fecha'])
+df = df.set_index('Fecha')
+df.head()
+```
+
+
+
+```{python}
+import matplotlib.pyplot as plt
+
+# 1. Grafica la serie "cruda" (después de eliminar la fila)
+plt.figure(figsize=(10, 4))
+plt.plot(df, label='Serie Original (con hueco eliminado)')
+plt.title('Verificación de Hueco')
+plt.xlabel('Fecha')
+plt.ylabel('Turbidez')
+plt.grid(True)
+plt.show()
+
+# 2. Si ves un salto o un punto discontinuo en el gráfico de arriba:
+# Entonces la interpolación NO se aplicó y el modelo la hizo "mágicamente" (poco probable)
+# O bien, el gráfico de arriba sí muestra el hueco y el modelo lo rellenó.
+
+# 3. Para confirmar, revisa si hay NaNs:
+print(f"¿Hay valores NaN en la serie? {df.isnull().sum()}")
+```
+
+verificar valores extremos
+
+```{python}
+# 1. Verificar los valores máximos
+print(f"Turbidez máxima: {df['turb'].max()}")
+print(f"Promedio: {df['turb'].mean():.2f}")
+
+# 2. Filtrar las filas donde la turbidez es alta (ej. > 1000)
+altos = df[df['turb'] > 1000]
+
+# 3. Mostrar las fechas y valores de esos picos
+print("\nRegistros con turbidez > 1000:")
+print(altos[['turb']].head(10)) # Muestra las primeras 10 filas
+
+# 4. (Opcional) Ver si esos picos coinciden con fechas específicas
+# Ejemplo: ¿Ocurren en meses de lluvia?
+altos['Mes'] = altos.index.month
+print("\nDistribución por mes de los picos:")
+print(altos['Mes'].value_counts().sort_index())
+```
+
+
+
+```{python}
+resultado = seasonal_decompose(df['turb'], model='additive', period=365)
+fig = resultado.plot()
+fig.set_size_inches(12, 8) # Opcional: ajustar tamaño
+plt.tight_layout()
+plt.show()
+```
+
+# Conductividad
+
+```{python}
+
+import pandas as pd
+
+df = pd.read_csv(r"Output/csv/SAMEEP 2017-2021/Datos-Sameep.csv")
+df['fecha y hora'] = pd.to_datetime(df['fecha y hora']) #para asegur que la columna sea datetime
+df.head()
+
+```
+
+Verifico si hay faltantes
+
+```{python}
+
+df_diario = df.groupby(df['fecha y hora'].dt.date)['cond'].mean().reset_index()
+
+df_diario.dropna(subset=['cond'], inplace=True)
+
+# Cambio el nombre de la columna de fecha para trabajar cómodo
+df_diario = df_diario.rename(columns={'fecha y hora': 'fecha'})
+
+# Convierto de nuevo a datetime (ahora es fecha única por día) y poner en índice
+df_diario['fecha'] = pd.to_datetime(df_diario['fecha'])
+df_diario = df_diario.set_index('fecha').sort_index()
+
+print(df_diario)
+
+```
+
+Completo la serie temporal
+
+```{python}
+rango_completo = pd.date_range(start=df_diario.index.min(), end=df_diario.index.max(), freq='D')
+
+# Reindexar y rellenar (ej: con promedio anterior o interpolación)
+df_completo = df_diario.reindex(rango_completo)
+df_completo = df_completo.interpolate()
+
+print("\nSerie temporal completa (sin huecos):")
+print(df_completo)
+
+df_completo.to_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\cond-2017-2021.csv", index=True)
+
+```
+
+Serie temporal
+
+importamos funciones
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose, STL
+```
+
+Lectura de datos
+
+```{python}
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\cond-2017-2021.csv")
+df['Fecha'] = pd.to_datetime(df['Fecha'])
+df = df.set_index('Fecha')
+df.head()
+```
+
+
+```{python}
+resultado = seasonal_decompose(df['cond'], model='additive', period=365)
+fig = resultado.plot()
+fig.set_size_inches(12, 8) # Opcional: ajustar tamaño
+plt.tight_layout()
+plt.show()
+```
+
+# pH SAMEEP
+
+
+```{python}
+
+import pandas as pd
+
+df = pd.read_csv(r"Output/csv/SAMEEP 2017-2021/Datos-Sameep.csv")
+df['fecha y hora'] = pd.to_datetime(df['fecha y hora']) #para asegur que la columna sea datetime
+df.head()
+
+```
+
+Verifico si hay faltantes
+
+```{python}
+
+df_diario = df.groupby(df['fecha y hora'].dt.date)['ph'].mean().reset_index()
+
+df_diario.dropna(subset=['ph'], inplace=True)
+
+# Cambio el nombre de la columna de fecha para trabajar cómodo
+df_diario = df_diario.rename(columns={'fecha y hora': 'fecha'})
+
+# Convierto de nuevo a datetime (ahora es fecha única por día) y poner en índice
+df_diario['fecha'] = pd.to_datetime(df_diario['fecha'])
+df_diario = df_diario.set_index('fecha').sort_index()
+
+print(df_diario)
+
+```
+
+Completo la serie temporal
+
+```{python}
+rango_completo = pd.date_range(start=df_diario.index.min(), end=df_diario.index.max(), freq='D')
+
+# Reindexar y rellenar (ej: con promedio anterior o interpolación)
+df_completo = df_diario.reindex(rango_completo)
+df_completo = df_completo.interpolate()
+
+print("\nSerie temporal completa (sin huecos):")
+print(df_completo)
+
+#df_completo.to_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\ph-2017-2021.csv", index=True)
+
+```
+
+Serie temporal
+
+importamos funciones
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose, STL
+```
+
+Lectura de datos
+
+```{python}
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\ph-2017-2021.csv")
+df['Fecha'] = pd.to_datetime(df['Fecha'])
+df = df.set_index('Fecha')
+df.head()
+```
+
+
+```{python}
+resultado = seasonal_decompose(df['ph'], model='additive', period=365)
+fig = resultado.plot()
+fig.set_size_inches(12, 8) # Opcional: ajustar tamaño
+plt.tight_layout()
+plt.show()
+```
+
+# para alturas
+
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose, STL
+from statsmodels.tsa.stattools import adfuller
+
+df = pd.read_csv(r"Output/csv/Corrientes/Alturas")
+
+resultado = seasonal_decompose(df['altura'], model='additive', period=365)
+fig = resultado.plot()
+fig.set_size_inches(12, 8) # Opcional: ajustar tamaño
+plt.tight_layout()
+plt.show()
+
+
+```
+
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose, STL
+from statsmodels.tsa.stattools import adfuller
+
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\turb-2017-2021.csv")
+
+stl = STL(df['turb'], period=7, robust=True)
+
+resultado_stl = stl.fit()
+
+fig = resultado_stl.plot()
+fig.set_size_inches(12, 10)
+plt.tight_layout()
+plt.show()
+
+```
