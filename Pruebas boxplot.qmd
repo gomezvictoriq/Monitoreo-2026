@@ -1,0 +1,71 @@
+
+
+
+```{python}
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\turb-2017-2021.csv")
+
+# Gráfico boxplot
+plt.figure(figsize=(8, 6))
+plt.boxplot(df['turb'], vert=True, patch_artist=True, labels=['Turbidez'])
+
+plt.title('Distribución de la Turbidez (2017-2026)')
+plt.ylabel('Altura [m]')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+plt.show()
+
+
+
+```
+
+
+
+
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# 1. Cargar los datos
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\turb-2017-2021.csv")
+
+# 2. Asegurar que la columna de fecha es datetime
+df['Fecha'] = pd.to_datetime(df['Fecha'])
+
+# 3. Filtrar solo Enero y usar .copy() para evitar la advertencia
+df_enero = df[df['Fecha'].dt.month == 1].copy() 
+
+# 4. Crear la columna de año
+df_enero['Año'] = df_enero['Fecha'].dt.year
+
+# Ordenar por año
+df_enero = df_enero.sort_values('Año')
+
+# 5. Preparar los datos
+valores_por_anio = [group['turb'].values for name, group in df_enero.groupby('Año')]
+etiquetas_anio = sorted(df_enero['Año'].unique())
+
+# 6. Crear el gráfico usando 'tick_labels' para evitar la advertencia de deprecación
+plt.figure(figsize=(10, 6))
+
+plt.boxplot(
+    valores_por_anio,
+    tick_labels=etiquetas_anio,  # Cambiado de 'labels' a 'tick_labels'
+    patch_artist=True,
+    boxprops=dict(facecolor='#ADEFD1', color='#008B8B'),
+    medianprops=dict(color='#FF6B6B'),
+    whiskerprops=dict(color='#555555'),
+    flierprops=dict(marker='o', markerfacecolor='red', markersize=6, linestyle='none', markeredgecolor='black')
+)
+
+plt.title('Distribución de la Turbidez en el mes de Enero (por Año)')
+plt.xlabel('Año')
+plt.ylabel('Turbidez [NTU]')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+plt.tight_layout()
+plt.show()
+```

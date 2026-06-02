@@ -14,7 +14,7 @@ format:
     lang: es
     bibliography: bibliografia/bibliografia.bib
     csl: bibliografia/ieee.csl
-    theme: flatly
+    theme: 'flatly'
     page-layout: full
     css: styles/styles.css
 
@@ -65,7 +65,7 @@ Algunas redes que están adheridas a la RHN son:
 
 La Subsecretaria de Recursos Hídricos, organismo encargado de gestionar la infraestructura de medición y la base de batos hidrológica integrada.
 
-**Base de datos consultadas**
+**Base de datos consultadas:** 
 
 ##	Sistema Nacional de Información Hídrica (SNIH)
 
@@ -103,7 +103,7 @@ Dentro de la zona de interés en este proyecto, los datos de caudales sólo esta
 
 ## Base de DATOS SAMEEP 2017-2021
 
-Actualmente no contamos una la base de datos actualizada de las plantas potabilizadoras de SAMMEP y de Aguas de Corrientes, por lo que de momento trabajamos con una base de datos de un proyecto anterior, con el fin de ir conociendo más funciones en Python y ganar práctica en este leguaje de programación.
+Actualmente no contamos una la base de datos actualizada de las plantas potabilizadoras de SAMEEP y de Aguas de Corrientes, por lo que de momento trabajamos con una base de datos de un proyecto anterior, con el fin de ir conociendo más funciones en Python y ganar práctica en este leguaje de programación.
 
 # Estación Corrientes
 
@@ -1183,32 +1183,228 @@ plt.show()
 ```
 
 
-## Caudales Estación Barranqueras
+# Boxplots
+
+## Turbidez
+
+En la @fig-plotbox-enero-turb , se puede observar que los valores de turbidez del año 2017 tienen mayor dispersión respecto a los años 2018 y 2019, no se presentan valores fuera del rango normal. La mediana está aproximadamente en la mitad de la caja. No se presentan valores atípicos. En cambio para 2018 y 2019 se observa menor dispersión en la distribusion de los datos, con cajas más pequeñas y con presencia de outliers por encima del rango normal. Para los años 2020 y 2021 vemos una distribución mucho mas amplia respecto a los años anteriores, los datos del año 2020 tienen a ser mas bajos comparados con los año 2021.
 
 ```{python}
+#| echo: false
 #| code-fold: true
+#| label: fig-plotbox-enero-turb
+#| fig-cap: " Distribución de la turbidez en el mes de enero por año"
+
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-from statsmodels.tsa.seasonal import seasonal_decompose, STL
 
-df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\Caudales_Barranqueras")
+# 1. Cargo los datos
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\turb-2017-2021.csv")
 
-df = df[df['Fecha y Hora'] >= '2017-01-01']
+# 2. Para asegurar que la columna de fecha es datetime
+df['Fecha'] = pd.to_datetime(df['Fecha'])
 
-df['Fecha y Hora'] = pd.to_datetime(df['Fecha y Hora'])
-df = df.set_index('Fecha y Hora')
-#print(df.dtypes)
+# 3. Filtro solo Enero
+df_enero = df[df['Fecha'].dt.month == 1].copy() 
 
-#df.head()
+# 4. Creo la columna de año
+df_enero['Año'] = df_enero['Fecha'].dt.year
 
-# Gráfico de serie temporal
+# Ordeno por año
+df_enero = df_enero.sort_values('Año')
 
-resultado = seasonal_decompose(df['caudal'], model='additive', period=365)
-fig = resultado.plot()
-fig.set_size_inches(12, 8) # para ajustar tamaño
+# 5. Preparo los datos
+valores_por_anio = [group['turb'].values for name, group in df_enero.groupby('Año')]
+etiquetas_anio = sorted(df_enero['Año'].unique())
+
+# 6. Gráfico
+plt.figure(figsize=(10, 6))
+
+plt.boxplot(
+    valores_por_anio,
+    tick_labels=etiquetas_anio,  # Cambiado de 'labels' a 'tick_labels'
+    patch_artist=True,
+    boxprops=dict(facecolor='#ADEFD1', color='#008B8B'),
+    medianprops=dict(color='#FF6B6B'),
+    whiskerprops=dict(color='#555555'),
+    flierprops=dict(marker='o', markerfacecolor='red', markersize=6, linestyle='none', markeredgecolor='black')
+)
+
+plt.title('Distribución de la Turbidez en el mes de Enero (por Año)')
+plt.xlabel('Año')
+plt.ylabel('Turbidez [NTU]')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+
 plt.tight_layout()
 plt.show()
 ```
 
+## Conductividad
+Como se observa en la @fig-plotbox-enero-cond, tanto para el año 2018 y 2019 presentan una distribución con poca dispersion en un rango entre 120 y 250 µS/cm aproximadamente, con la diferencia que en enero del 2018 hubo algunos valores outliers por encima, tambien se observa que la mediana está mas cerca del primer cuartil, en cambio en el 2019 la mediana está más centrada en la caja. 
+Al igual que con los datos de turbidez en los años siguientes (del mes de enero) hay mayor dispersión, siendo más acentuada en el año 2020. Tanto para el 2020 y el 2021, las cajas están ubicadas muy próximas a los valores mínimos correspondiente, presentando outliers en enero del 2021.
 
+```{python}
+#| echo: false
+#| code-fold: true
+#| label: fig-plotbox-enero-cond
+#| fig-cap: " Distribución de la conductividad en el mes de enero por año"
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# 1. Cargo los datos
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\cond-2017-2021.csv")
+
+# 2. Para asegurar que la columna de fecha es datetime
+df['Fecha'] = pd.to_datetime(df['Fecha'])
+
+# 3. Filtro solo Enero
+df_enero = df[df['Fecha'].dt.month == 1].copy() 
+
+# 4. Creo la columna de año
+df_enero['Año'] = df_enero['Fecha'].dt.year
+
+# Ordeno por año
+df_enero = df_enero.sort_values('Año')
+
+# 5. Preparo los datos
+valores_por_anio = [group['cond'].values for name, group in df_enero.groupby('Año')]
+etiquetas_anio = sorted(df_enero['Año'].unique())
+
+# 6. Gráfico
+plt.figure(figsize=(10, 6))
+
+plt.boxplot(
+    valores_por_anio,
+    tick_labels=etiquetas_anio,  # Cambiado de 'labels' a 'tick_labels'
+    patch_artist=True,
+    boxprops=dict(facecolor='#ADEFD1', color='#008B8B'),
+    medianprops=dict(color='#FF6B6B'),
+    whiskerprops=dict(color='#555555'),
+    flierprops=dict(marker='o', markerfacecolor='red', markersize=6, linestyle='none', markeredgecolor='black')
+)
+
+plt.title('Distribución de la Conductividad en el mes de Enero (por Año)')
+plt.xlabel('Año')
+plt.ylabel('Conductividad [µS/cm]')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+plt.tight_layout()
+plt.show()
+```
+
+## pH
+
+```{python}
+#| echo: false
+#| code-fold: true
+#| label: fig-plotbox-enero-pH
+#| fig-cap: " Distribución del pH en el mes de enero por año"
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# 1. Cargo los datos
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\ph-2017-2021.csv")
+
+# 2. Para asegurar que la columna de fecha es datetime
+df['Fecha'] = pd.to_datetime(df['Fecha'])
+
+# 3. Filtro solo Enero
+df_enero = df[df['Fecha'].dt.month == 1].copy() 
+
+# 4. Creo la columna de año
+df_enero['Año'] = df_enero['Fecha'].dt.year
+
+# Ordeno por año
+df_enero = df_enero.sort_values('Año')
+
+# 5. Preparo los datos
+valores_por_anio = [group['ph'].values for name, group in df_enero.groupby('Año')]
+etiquetas_anio = sorted(df_enero['Año'].unique())
+
+# 6. Gráfico
+plt.figure(figsize=(10, 6))
+
+plt.boxplot(
+    valores_por_anio,
+    tick_labels=etiquetas_anio,  # Cambiado de 'labels' a 'tick_labels'
+    patch_artist=True,
+    boxprops=dict(facecolor='#ADEFD1', color='#008B8B'),
+    medianprops=dict(color='#FF6B6B'),
+    whiskerprops=dict(color='#555555'),
+    flierprops=dict(marker='o', markerfacecolor='red', markersize=6, linestyle='none', markeredgecolor='black')
+)
+
+plt.title('Distribución del pH en el mes de Enero (por Año)')
+plt.xlabel('Año')
+plt.ylabel('pH')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+plt.tight_layout()
+plt.show()
+```
+
+## Altura Barranqueras 
+
+```{python}
+#| echo: false
+#| code-fold: true
+#| label: fig-plotbox-enero-alturas-barranqueras
+#| fig-cap: " Distribución de la altura en el mes de enero por año"
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# 1. Cargo los datos
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\Datos para series temporales\Alturas_Barranqueras")
+
+# 2. Para asegurar que la columna de fecha es datetime
+df['Fecha y Hora'] = pd.to_datetime(df['Fecha y Hora'])
+df = df[df['Fecha y Hora'] >= '2017-01-01']
+
+# 3. Filtro solo Enero
+df_enero = df[df['Fecha y Hora'].dt.month == 1].copy() 
+
+# 4. Creo la columna de año
+df_enero['Año'] = df_enero['Fecha y Hora'].dt.year
+
+# Ordeno por año
+df_enero = df_enero.sort_values('Año')
+
+# 5. Preparo los datos
+valores_por_anio = [group['altura'].values for name, group in df_enero.groupby('Año')]
+etiquetas_anio = sorted(df_enero['Año'].unique())
+
+# 6. Gráfico
+plt.figure(figsize=(10, 6))
+
+plt.boxplot(
+    valores_por_anio,
+    tick_labels=etiquetas_anio,  # Cambiado de 'labels' a 'tick_labels'
+    patch_artist=True,
+    boxprops=dict(facecolor='#ADEFD1', color='#008B8B'),
+    medianprops=dict(color='#FF6B6B'),
+    whiskerprops=dict(color='#555555'),
+    flierprops=dict(marker='o', markerfacecolor='red', markersize=6, linestyle='none', markeredgecolor='black')
+)
+
+plt.title('Distribución de las alturas en el mes de Enero (por Año)')
+plt.xlabel('Año')
+plt.ylabel('Altura [m]')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+plt.tight_layout()
+plt.show()
+
+
+
+```
+
+
+
+
+#
+
+
+#

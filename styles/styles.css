@@ -1,18 +1,33 @@
-/* Reducir tamaño de encabezados H2 (Nivel 2) */
-h2 {
-  font-size: 1.5rem !important; /* Ajusta el valor (ej: 1.2rem, 1.8rem) */
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
+/* Reducir el tamaño base de todo el documento */
+body {
+  font-size: 14px; /* Por defecto suele ser 16px. 14px lo hace más compacto */
+  line-height: 1.4; /* Ajusta la altura de línea para que no se vea apretado */
 }
 
-/* Reducir tamaño de encabezados H3 (Nivel 3) */
-h3 {
-  font-size: 1.2rem !important; /* Ajusta el valor */
-  margin-top: 1.2rem;
-  margin-bottom: 0.4rem;
+/* Asegura que los encabezados escalen respecto al nuevo cuerpo */
+h1 { font-size: 1.5rem !important; } /* ~28px si base es 14px */
+h2 { font-size: 1.2rem !important; } /* ~21px */
+h3 { font-size: 1.1rem !important; } /* ~17.5px */
+h4 { font-size: 1.0rem !important; }
+
+/* Ajusta el tamaño de los párrafos también */
+p {
+  font-size: 1rem !important; /* 14px */
 }
 
-/* Opcional: Ajustar H4 si los usas más abajo */
-h4 {
-  font-size: 1.1rem !important;
+
+/* Fuerza el tamaño en los párrafos dentro del contenido principal */
+#quarto-doc, .quarto-default, .content, article, main {
+  font-size: 14px !important;
+}
+
+/* Asegura que los párrafos dentro de esas áreas respeten el tamaño */
+#quarto-doc p, .quarto-default p, .content p, article p, main p {
+  font-size: 1rem !important; /* 14px */
+  line-height: 1.5 !important;
+}
+
+/* Si usas bloques de cita o listas, ajústalos también */
+blockquote, li, td, th {
+  font-size: 1rem !important;
 }
