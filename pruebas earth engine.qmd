@@ -1,0 +1,60 @@
+
+# Pruebas Earth Engine
+
+Conexión con Google Earth Engine
+
+```{python}
+import ee # que es la libreía de Google Earth Engine
+
+try:
+    ee.Initialize(project='gistaq-2026') 
+    print("Conexión exitosa.")
+except Exception as e:
+    print(f"Error: {e}")
+```
+
+Defino zona de interés.
+Un rectángulo en programación y en Google Earth Engine se define por dos puntos opuestos:
+
+- Esquina Inferior Izquierda (Suroeste)
+- Esquina Superior Derecha (Noreste)
+
+Formato: [longitud_oeste, latitud_sur, longitud_este, latitud_norte]
+
+
+```{python}
+# 2. Definir el un rectángulo de la zona de interés
+
+rect_coords = [-58.918945434376674, 
+                -27.718468475553756, 
+                -58.537170532032924, 
+                -27.272618773023325] 
+roi = ee.Geometry.Rectangle(rect_coords, proj='EPSG:4326', geodesic=False)
+
+print(f"Área de interés definida: {rect_coords}")
+```
+
+
+Se pueden usar imágenes Landsat-8 o Landsat-9
+
+LANDSAT/LC08/C02/T1_L2
+LANDSAT/LC09/C02/T1_L2 
+
+
+1 - LANDSAT: El programa o misión satelital
+2 - LC09 (o LC08): Es l nombre del satélite específico.
+3 - C02: Colección, es el nivel de procesamiento y organización de los datos. De C02 (Collection 2), son los datos más modernos y precisos. Incluyen correcciones atmosféricas, topográficas y de calibración mejoradas. C01, contiene datos antiguos.
+
+4- T1: Es el Nivel de Procesamiento (Tier).
+
+- T1 (Tier 1): Datos de calidad superior. Han sido corregidos, calibrados y verificados rigurosamente. Son los que se usan para comparar datos de diferentes años o satélites.
+- T2 (Tier 2): Datos provisionales. Son buenos, pero pueden tener pequeñas variaciones. Se usan si no se encuentran datos Tier 1.
+- RT (Real Time): Datos casi inmediatos sin corrección completa.
+
+5- L2: Nivel de Producto. Indica qué tan procesados están los datos crudos:
+- L1: Imagen cruda (nivel radiométrico). Se necesita hacer correcciones.
+- L2 (Surface Reflectance): Datos ya corregidos.
+
+
+
+Imágenes del satélite Landsat 9, pertenecientes a la Colección 2 (más precisa), nivel Tier 1 (calidad verificada), y procesadas a Nivel 2 (ya corregidas atmosféricamente)".

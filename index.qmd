@@ -1,34 +1,38 @@
 ---
 title: "Monitoreo 2026"
 
+
+brand: _brand.yml
 freeze: auto
+
 
 format: 
   html:
     number-sections: true
     toc: true
-    toc-width: "5%"
+    toc-title: "<img src='img/logo-gistaq.png' style='width:100%; max-width:120px; display:block; margin-bottom:15px;'> Índice"
+    toc-width: "18%"
     toc-location: left
     embed-resources: false
     crossrefs-hover: false
     lang: es
     bibliography: bibliografia/bibliografia.bib
     csl: bibliografia/ieee.csl
-    theme: 'flatly'
     page-layout: full
-    css: styles/styles.css
-
-
+    theme: 
+      - default
+      - brand
     
+
 
 date: last-modified
 author:
-  - name: Víctor Gustavo Gómez
+  - name: "Víctor Gustavo Gómez"
     corresponding: true
-    email: gomezvictoriq@ca.frre.utn.edu.ar
+    email: "gomezvictoriq@ca.frre.utn.edu.ar"
     affiliations:
-      - name: GISTAQ (UTN-FRRe)
-        url: https://www.instagram.com/gistaq.utn/
+      - name: "GISTAQ (UTN-FRRe)"
+        url: "https://www.instagram.com/gistaq.utn/"
 abstract: |
   Este sitio web contiene información ...
   
@@ -147,8 +151,6 @@ fig.show()
 ```
 
 **Evolución del caudal a lo largo de los años**
-
-
 
 ```{python}
 #| code-fold: true
@@ -739,7 +741,6 @@ plt.title('Histograma: Conductividad 2011-2018')
 plt.show()
 
 ```
-
 
 
 # Estación Isla del Cerrito 
@@ -1397,14 +1398,1717 @@ plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.tight_layout()
 plt.show()
 
+```
+
+# Descarga de imágenes satelitales en Google Earth Engine 
+
+Conexión con Google Earth Engine
+
+```{python}
+#| output: false
+import ee
+
+try:
+    # Configuramos el método para que lea tus credenciales locales guardadas
+    ee.Initialize(project='gistaq-2026')
+    print("Conexión exitosa.")
+except Exception as e:
+    print(f"Error detectado: {e}")
+```
+
+
+Defino la zona de interés. Podemos definir la zona de la cual nos interesa extraer los valores de reflectancia. Alguna de esllas son 
+
+- **ROI** Región de interés, por ejemplo: un rectángulo.
+
+Un rectángulo en Google Earth Engine se define por dos puntos opuestos:
+
+ - Esquina Inferior Izquierda (Suroeste)
+ - Esquina Superior Derecha (Noreste)
+
+Formato: [longitud_oeste, latitud_sur, longitud_este, latitud_norte]
+
+- **POI** Punto de interés.
+
+ Se define en formato: [longitud, latitud]
+
+- **Buffer** (Área de influencia): Crea un polígono alrededor de un punto, línea o polígono a una distancia específica. Por ejemplo: un radio de 5 metros alrededor de un punto.
+
+**Definimos 1 punto de práctica**
+
+```{python}
+#| code-fold: true
+#| output: false
+
+poi =  ee.Geometry.Point([-58.874118, -27.479538])
+
+print(f"Punto de interés definido")
+```
+
+Seleccionamos la colección de Landsat-8
+
+```{python}
+#| code-fold: true
+
+# Trabajo con la colección TOA y filtro por el POI de prueba y tango de fecha, seleccionamos la imágen más despejada
+
+dataset = (ee.ImageCollection('LANDSAT/LC08/C02/T1_TOA')
+           .filterDate('2017-01-01', '2017-12-31')
+           .filterBounds(poi)          # <--- Filtra SOLO tu zona
+           .filter(ee.Filter.lt('CLOUD_COVER', 10))
+           .sort('CLOUD_COVER')        # Ordena de menor a mayor nubes
+           .first())                   # <--- Toma SOLO la primera (la más limpia)
+```
+
+Vizualizacion en el mapa
+
+```{python}
+#| code-fold: true
+#| label: mapa-landsat1
+#| eval: false
+import ee
+import geemap
+
+# Inicializa usando tu ID de proyecto de Google Cloud
+ee.Initialize(project='gistaq-2026')
+
+true_color = dataset.select(['B4', 'B3', 'B2'])
+vis_params = {'min': 0.0, 'max': 0.4, 'bands': ['B4', 'B3', 'B2']}
+
+m = geemap.Map(backend="folium")
+m.centerObject(poi, zoom=14) 
+m.addLayer(true_color, vis_params, 'Landsat 8 TOA (2017)')
+m.addLayer(poi, {'color': 'FF0000'}, 'POI')
+
+# Guardamos el mapa localmente como un archivo HTML estático, para luego insertarlo en el sitio
+m.to_html("D:/Monitoreo 2026/Output/mapas/mapa1.html")
+
+```
+
+<iframe src="Output/mapas/mapa1.html" width="100%" height="500px" style="border:none;"></iframe>
+
+
+**Extracción de reflectancias para 1 punto en particular**
+
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+
+# 1. Coordenadas del punto (Longitud, Latitud)
+punto_prueba = ee.Geometry.Point([-58.874118, -27.479538])
+
+# 2. Seleccionamos la primera imagen disponible de la colección Landsat 8 TOA
+imagen = (ee.ImageCollection('LANDSAT/LC08/C02/T1_TOA')
+          .filterBounds(punto_prueba)
+          .first()) # Tomamos la primera escena sin filtros
+
+# 3. Obtengo la lista completa de todas las bandas que existen dentro de esta imagen
+
+todas_las_bandas = imagen.bandNames().getInfo()
+
+# 4. Extraer los valores de todas las bandas para el punto del píxel
+
+valores_reducidos = imagen.reduceRegion(
+    reducer=ee.Reducer.first(),
+    geometry=punto_prueba,
+    scale=30
+).getInfo()
+
+# 5. Extraer metadatos clave de la imagen para sumarlos al análisis
+
+metadatos = {
+    'ID_IMAGEN': imagen.id().getInfo(),
+    'FECHA_ADQUISICION': imagen.date().format('YYYY-MM-DD HH:mm:ss').getInfo(),
+    'NUBOSIDAD_ESCENA_PORCENTAJE': imagen.get('CLOUD_COVER').getInfo()
+}
+
+# 6. Unificar metadatos y valores de las bandas en una estructura plana
+datos_completos = {**metadatos, **valores_reducidos}
+
+# 7. Convertir a un DataFrame de Pandas (Estructura de tabla)
+# Transponemos para que las variables queden en filas y sea más cómodo de leer
+df = pd.DataFrame(list(datos_completos.items()), columns=['Componente / Banda', 'Valor Registrado'])
+
+# 8. Guardar el archivo en tu computadora como CSV
+archivo_salida = "analisis_crudo_pixel.csv"
+df.to_csv(archivo_salida, index=False)
+
+# Visualización de los datos
+
+print(df.to_string(index=False)) # Imprime la tabla completa sin recortes en la consola
+
+```
+
+
+Flujo de trabajo.
+
+
+El Flujo de Trabajo Definitivo
+
+Búsqueda y Filtrado Temporal (Nivel Escena
+
+1. Buscas en el catálogo de Landsat 8 para tus coordenadas.
+
+Usas el metadato global CLOUD_COVER para descartar de golpe los días donde toda la región estuvo bajo tormentas (por ejemplo, descartas todo lo que tenga más del 20% o 30% de nubes).
+
+2. Limpieza Quirúrgica (Nivel Píxel con QA_PIXEL)
+
+Abres las imágenes sobrevivientes y analizas la matriz del QA_PIXEL [Landsat]
+
+Descartas (enmascaras) individualmente los píxeles donde el binario indique nubes o sombras [Landsat]. Si en tu grilla de 3x3 hay un píxel con nube, ese píxel se apaga y te quedas solo con los píxeles sanos.
+
+3. Corrección Atmosférica (Nivel Píxel Individual)
+
+Aplicas tu algoritmo de corrección atmosférica sobre cada uno de los píxeles limpios que quedaron en la grilla.
+
+Esto transforma los valores de reflectancia TOA (Tope de la Atmósfera) a Reflectancia de Superficie (BOA), eliminando el ruido del aire, el polvo y el vapor de agua de forma matemática para cada coordenada exacta.
+
+4. Reducción Espacial (El Promedio de la Grilla)
+
+Ahora que tienes píxeles que son 100% agua pura, libres de nubes y corregidos atmosféricamente, calculas el promedio matemático banda por banda de tu grilla.
+
+Este valor promedio final será el dato más puro, estable y libre de anomalías locales para analizar los componentes del río (como sedimentos o clorofila).
+
+
+Defino grilla de 3x3 pixeles
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+
+# 1. Punto central en el Río Paraná
+punto = ee.Geometry.Point([-58.874118, -27.479538])
+
+# 2. Generar el área de 3x3 píxeles de Landsat 8 (90x90 metros aprox)
+# Crea un buffer de 45 metros hacia cada lado y obtenemos su rectángulo (bounds)
+grilla_3x3 = punto.buffer(45).bounds()
+
+# 3. Selecciona la colección TOA y filtrar ROI y fecha
+dataset = (ee.ImageCollection('LANDSAT/LC08/C02/T1_TOA')
+           .filterDate('2017-01-01', '2017-12-31')
+           .filterBounds(grilla_3x3)          # <--- Filtra SOLO tu zona
+           .filter(ee.Filter.lt('CLOUD_COVER', 10))
+           .sort('CLOUD_COVER')        # Ordena de menor a mayor nubes
+           .first())                   # <--- Toma SOLO la primera (la más limpia)
+```
+
+
+Localización de la zona de 3x3 píxeles en el mapa
+
+```{python}
+#| code-fould: true
+#| label: mapa-landsat2
+#| eval: false
+
+import ee
+import geemap
+
+# 4. Selecciono bandas True Color (B4=Rojo, B3=Verde, B2=Azul)
+true_color = dataset.select(['B4', 'B3', 'B2'])
+
+# 5. Configuración de  visualización
+
+vis_params = {
+    'min': 0.0,
+    'max': 0.4,
+    'bands': ['B4', 'B3', 'B2']
+}
+
+# 6. el mapa centrado en tu ROI
+m = geemap.Map(backend="folium")
+m.centerObject(grilla_3x3, zoom=14)  # Centra el mapa en tu ROI con zoom 10
+
+# Añadir la imagen
+m.addLayer(true_color, vis_params, 'Landsat 8 TOA (2017)')
+
+# Añadir un borde a tu ROI para que se vea mejor
+m.addLayer(grilla_3x3, {'color': 'FF0000'}, 'ROI')
+
+# === SOLUCIÓN EXPORTACIÓN QUARTO ===
+# Guarda el mapa localmente como un archivo HTML estático
+m.to_html("D:/Monitoreo 2026/Output/mapas/mapa2.html")
+m
+```
+
+<iframe src="Output/mapas/mapa2.html" width="100%" height="500px" style="border:none;"></iframe>
+
+
+Extracción de los datos de una imagen 
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import numpy as np
+
+# 1. Tu punto central en el Río Paraná
+punto_prueba = ee.Geometry.Point([-58.874118, -27.479538])
+
+# 2. Tomo la primera imagen disponible de la colección
+imagen =(ee.ImageCollection('LANDSAT/LC08/C02/T1_TOA')
+           .filterDate('2017-01-01', '2017-12-31')
+           .filterBounds(punto_prueba)          
+           .filter(ee.Filter.lt('CLOUD_COVER', 10))
+           .sort('CLOUD_COVER')        
+           .first())                   
+
+
+
+# 3. Definir las bandas que te interesan
+bandas_interes = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8','B9', 'B10', 'B11', 'QA_PIXEL']
+imagen_seleccionada = imagen.select(bandas_interes)
+
+# 4. Crear la vecindad de 3x3 usando los argumentos correctos de la API de Python
+kernel = ee.Kernel.rectangle(xRadius=1, yRadius=1, units='pixels')
+imagen_grilla = imagen_seleccionada.neighborhoodToArray(kernel)
+
+# 5. Extraer los valores concentrados en el punto de prueba
+valores_reducidos = imagen_grilla.reduceRegion(
+    reducer=ee.Reducer.first(),
+    geometry=punto_prueba,
+    scale=30
+).getInfo()
+
+
+lista_pixeles = []
+
+
+matriz_base = np.array(valores_reducidos.get('B1'))
+filas, columnas = matriz_base.shape
+
+print(f"Dimensiones de la grilla detectada: {filas}x{columnas} píxeles.\n")
+
+for i in range(filas):
+    for j in range(columnas):
+        datos_pixel = {
+            'Fila_Grilla': i + 1,
+            'Columna_Grilla': j + 1
+        }
+        # Extraer el valor de cada banda indexando la posición [i][j]
+        for banda in bandas_interes:
+            matriz_banda = valores_reducidos.get(banda)
+            if matriz_banda is not None:
+                datos_pixel[banda] = matriz_banda[i][j]
+            else:
+                datos_pixel[banda] = None
+                
+        lista_pixeles.append(datos_pixel)
+
+ 
+df = pd.DataFrame(lista_pixeles)
+archivo_salida = "grilla_3x3_corregida.csv"
+df.to_csv(archivo_salida, index=False)
+
+
+print("=" * 65)
+print("GRILLA 3X3 REFLECTANCIA TOA")
+print("=" * 65)
+print(df.to_string(index=False))
+print("=" * 65)
+```
+
+# Correciones atmosféricas
+
+## Sustracción del objeto oscuro - Dark Object Subtraction (DOS)
+
+**Método DOS clásico**
+
+La mayoría de las técnicas de sustracción de objetos oscuros asumen que hay una alta probabilidad de que haya al menos algunos píxeles dentro de una imagen que deberían ser negros (0% de reflectancia). Esta suposición se hace porque en una sola banda hay un número muy grande de píxeles.
+
+Un método denominado **método del histograma** permite al usuario seleccionar el valor de nebulosidad directamente del histograma de frecuencia de una imagen digital.
+
+En estos histogramas usualmente hay un aumento muy pronunciado en el número de píxeles en algún valor X distinto de cero. Se supone que este valor X es la cantidad de neblina en esa banda en particular. 
+
+Si se usan en áreas muy localizadas, puede que no se encuentre un mínimo real u objeto oscuro, y el valor seleccionado corregirá en exceso la neblina atmosférica.
+
+$$
+ReflectanciaBOA=Reflectancia TOA-Haze(Banda)
+$$
+
+ReflectanciaBOA = Reflectancia en la superficie
+RefelctanciaTOA = Reflectancia tope de atmósfera
+
+**Método mejorado (Chávez)**
+
+Pueden surgir problemas en la etapa de análisis porque los valores seleccionados para la eliminación de neblina pueden no ajustarse a un modelo de dispersión atmosférica relativa realista. Esta falta de conformidad puede causar que los datos se sobrecorrijan en algunas o todas las bandas espectrales, y la relación espectral entre las bandas no será correcta.
+
+El método propone selecionar un valor inicial de 1 banda en particular, para hacer la corrección en esa banda y en función de eso hacer las correcciones para las otras bandas.
+
+Luego, el usuario selecciona un modelo de dispersión relativa que considere que representa mejor las condiciones atmosféricas al momento de la recopilación de datos.
+
+Dos modelos de dispersión relativa bien conocidos son los modelos de Rayleigh y Mie
+
+El modelo de Rayleigh establece que la dispersión relativa es inversamente proporcional a la cuarta potencia de la longitud de onda (k^-4), lo que significa que las longitudes de onda más cortas del espectro se dispersan mucho más que las longitudes de onda más largas
+
+osea la banda del azul, es la mas sencible. 
+
+$$
+Haze(Banda_i)=Haze(Banda_1)\left(\frac{\lambda_i}{\lambda_1}\right)^{k}  
+$$
+
+
+Valores de referencia para asignar k.
+
+- Si la reflectancia B1 TOA <= 0.035 → k =4 (Muy claro)
+- Si la reflectancia B1 TOA 0.035 < B1 TOA <= 0.050 → k = 2 (Claro)
+- Si la reflectancia B1 TOA 0.050 < B1 TOA <= 0.065 → k= 1 (Moderado)
+- Si la reflectancia B1 TOA 0.065 < B1 TOA <= 0.085 → k = 0.7 (Brumoso)
+- Si la reflectancia B1 TOA > 0.085 → k = 0.5 (Muy brumoso)
+
+Pasos:
+
+1. Delimitar un ROI grande que incluyan en lo posible algunas lagunas grandes y profundas.
+2. Buscar una imagen en la cual los píxeles que me interesan corregir no sean nubes. (con el QA píxel)
+3. Determinar el píxel oscuro de la banda 1. (Usar el percentil 1)
+4. En función del valor del pixel oscuro, asignar el valor de K, para ese día.
+5. Calcular el ruido para cada una de las bandas. Usando la ecuación 
+6. Restar ese valor de ruido a la reflectancia de cada píxel en en cada banda.
+
+
+Longitud de onda central de cada banda
+
+- B1 443 nm
+- B2 482 nm
+- B3 562 nm
+- B4 655 nm
+- B5 865 nm
+
+## Prueba de corrección atmosférica
+
+Conexión con Google Earth Engine
+
+```{python}
+
+import ee
+
+ee.Initialize(project='gistaq-2026')
+```
+
+Defino grilla 3x3 (Zona de interés) y zona de búsqueda pixel oscuro
+
+```{python}
+#| echo: false
+#| output: false
+import ee
+
+print("=== CONFIGURACIÓN DE GEOMETRÍAS ===")
+
+# Punto central en el cauce principal del Río Paraná
+punto_parana = ee.Geometry.Point([-58.874118, -27.479538])
+
+# Generamos un buffer de 45 metros a cada lado para cubrir un área de ~90x90m.
+# Al aplicar '.bounds()' lo convertimos en un rectángulo perfecto (3x3 píxeles de Landsat).
+grilla_estudio_3x3 = punto_parana.buffer(45).bounds()
+
+print("🟢 Área 1 (Grilla 3x3 Río Paraná) configurada correctamente.")
+
+# AREA 2: Región de Búsqueda del Píxel Oscuro (Laguna Profunda)
+# Coordenada central de la laguna grande y profunda elegida
+lat_laguna = -28.000158252668115
+lon_laguna = -57.82968917552424
+
+
+punto_laguna_centro = ee.Geometry.Point([lon_laguna, lat_laguna])
+
+#lat_laguna = -27.43720964472461
+#lon_laguna = -57.91695347744052
+
+#-57.82968917552424,-28.000158252668115
+
+#-27.463714624132493, -56.72531415566863
+
+# Creamos un recuadro automático de 800m x 800m en el centro de la laguna.
+# Al usar un buffer controlado, nos aseguramos de no tocar las orillas ni vegetación costera.
+ROI_laguna = punto_laguna_centro.buffer(400).bounds()
+
+print("🟢 Área 2 (ROI de búsqueda en Laguna) configurada correctamente.")
+print("===================================")
+
+# 3. ID de la imagen real y despejada (17 de Mayo de 2013)
+id_imagen = 'LANDSAT/LC08/C02/T1_TOA/LC08_226079_20130517'
+imagen = ee.Image(id_imagen)
+
+print("🟢 Paso 1 completado con éxito.")
+
+```
+
+Verificación de ubicación de geometrías
+
+```{python}
+#| eval: false
+#| echo: false
+
+import geemap
+
+# 1. Crear el mapa interactivo de geemap centrado en la zona de estudio
+mapa_gee = geemap.Map(center=[-27.45, -58.40], zoom=11)
+
+# 2. Agregar tus capas de Earth Engine directamente al mapa
+# geemap acepta objetos ee.Geometry de forma nativa sin necesidad de convertirlos
+mapa_gee.addLayer(grilla_estudio_3x3, {'color': 'blue'}, "Grilla 3x3 Parana")
+mapa_gee.addLayer(ROI_laguna, {'color': 'green'}, "ROI_laguna")
+
+# 3. Mostrar el mapa interactivo en VS Code
+mapa_gee.to_html("D:\Monitoreo 2026\Output\mapas\mapa_1_geometrias.html")
+
+```
+
+<iframe src="Output/mapas/mapa_1_geometrias.html" width="100%" height="500px" style="border: none;"></iframe>
+
+
+una vez verificada la ubicación de las zonas de interés, buscamos una imagen despejada para probar nuestra ecuación de corrección atmosfércia.
+
+
+```{python}
+#| code-fold: true
+#| output: false
+import pandas as pd
+import numpy as np
+import ee
+
+# =====================================================================
+# PASO 2: BÚSQUEDA AUTOMÁTICA DE IMAGEN CON FILTRO OPTIMIZADO
+# =====================================================================
+print("\n--- PASO 2: Buscando Automáticamente una Imagen Limpia ---")
+
+# 1. Filtramos la colección de Landsat 8 TOA para todo el rango disponible
+# Aplicamos un filtro nativo para nubes generales menor al 30% para acelerar el proceso
+coleccion_completa = (ee.ImageCollection('LANDSAT/LC08/C02/T1_TOA')
+                      .filterDate('2013-01-01', '2026-12-31')
+                      .filterBounds(grilla_estudio_3x3)
+                      .filter(ee.Filter.lt('CLOUD_COVER', 30))
+                      .sort('CLOUD_COVER')) 
+
+# Extraemos la lista de imágenes disponibles
+lista_features = coleccion_completa.getInfo().get('features', [])
+print(f"Se encontraron {len(lista_features)} imágenes despejadas en la órbita.")
+print("Inspeccionando tus 9 píxeles exactos hasta hallar la primera escena limpia...\n")
+
+imagen_perfecta = None
+id_seleccionado = None
+
+# Recorremos las imágenes de la lista
+for escena in lista_features:
+    id_actual = escena['id']
+    img_evaluar = ee.Image(id_actual)
+    
+    try:
+        # CORRECCIÓN CRÍTICA: Añadido .select('QA_PIXEL') para procesar solo esa banda
+        qa_parana = img_evaluar.select('QA_PIXEL').reduceRegion(
+            reducer=ee.Reducer.toList(),
+            geometry=grilla_estudio_3x3,
+            scale=30
+        ).getInfo().get('QA_PIXEL')
+        
+        if not qa_parana:
+            continue
+            
+        # Decodificar bits (Bit 7=Agua, Bit 3=Nube, Bit 4=Sombra de nube)
+        es_agua_parana = [(int(v) & 128) > 0 for v in qa_parana]
+        tiene_nube_parana = [(int(v) & 8) > 0 for v in qa_parana]
+        tiene_sombra_parana = [(int(v) & 16) > 0 for v in qa_parana]
+        
+        # FILTRO EXIGENTE DE CLIMA (0% nubes, 0% sombras en tu zona de estudio)
+        if not any(tiene_nube_parana) and not any(tiene_sombra_parana):
+            imagen_perfecta = img_evaluar
+            id_seleccionado = id_actual
+            
+            print(f"🟢 ¡Imagen ideal encontrada!")
+            print(f"👉 ID Oficial de la imagen sin nubes: '{id_seleccionado}'")
+            print(f"ℹ Nota informativa: {sum(es_agua_parana)} de 9 píxeles pasaron la máscara automática de agua.")
+            break
+            
+    except Exception as e:
+        # Muestra el error en consola si algo falla en la conexión para saber qué pasa
+        print(f"⚠️ Error al leer la escena {id_actual}: {str(e)}")
+        continue
+
+
+# =====================================================================
+# PASO 3: EXTRACCIÓN DEL PÍXEL OSCURO EN LA LAGUNA
+# =====================================================================
+if imagen_perfecta is not None:
+    print("\n--- PASO 3: Extrayendo el Píxel Oscuro de la Laguna ---")
+    
+    # Enmascaramos nubes y sombras locales dentro de la Laguna Grande por seguridad
+    qa_band = imagen_perfecta.select('QA_PIXEL')
+    mascara_limpia = qa_band.bitwiseAnd(8).eq(0).And(qa_band.bitwiseAnd(16).eq(0))
+    banda1_laguna_limpia = imagen_perfecta.select('B1').updateMask(mascara_limpia)
+    
+    # Calcular el Percentil 1 de reflectancia TOA en la banda 1 de la laguna
+    # Corregido: ee.Reducer.percentile([1]) requiere pasar la lista con el número del percentil
+    pixel_oscuro_b1 = banda1_laguna_limpia.reduceRegion(
+        reducer=ee.Reducer.percentile([1]), 
+        geometry=ROI_laguna,
+        scale=30
+    ).getInfo().get('B1')
+    
+    print(f"🟢 ¡Píxel oscuro calculado con éxito!")
+    print(f"➡ El valor del Píxel Oscuro (Percentil 1) en la Banda 1 es: {pixel_oscuro_b1}")
+    print("\n[Estructura base completada. Código listo para recibir tus ecuaciones matemáticas]")
+else:
+    print("❌ Error: No se encontró ninguna imagen completamente libre de nubes/sombras en el rango de fechas.")
+
+
+```
+
+Buscamos una imagen limpia para probar 
+
+la imagen de prueba es la 
+
+LANDSAT/LC08/C02/T1_TOA/LC08_226079_20130817
+
+
+
+
+## Corrección con B1 (Aerosol costero)
+
+```{python}
+#| echo: false
+#| output: false
+import pandas as pd
+import numpy as np
+import ee
+
+# =====================================================================
+# PASO 1: Defino zonas de interés
+# =====================================================================
+punto_parana = ee.Geometry.Point([-58.874118, -27.479538])
+grilla_3x3 = punto_parana.buffer(45).bounds()
+
+lat_laguna = -28.000158252668115
+lon_laguna = -57.82968917552424
+punto_laguna_centro = ee.Geometry.Point([lon_laguna, lat_laguna])
+ROI_laguna = punto_laguna_centro.buffer(400).bounds()
+
+# =====================================================================
+# PASO 2: Carga de imagen 
+# =====================================================================
+print("--- PASO 2: Cargando la escena fija limpia ---")
+id_imagen = 'LANDSAT/LC08/C02/T1_TOA/LC08_226079_20130817'
+imagen_perfecta = ee.Image(id_imagen)
+
+# Verificar QA_PIXEL en el río Paraná (0% nubes/sombras)
+qa_parana = imagen_perfecta.select('QA_PIXEL').reduceRegion(
+    reducer=ee.Reducer.toList(),
+    geometry=grilla_3x3,
+    scale=30
+).getInfo().get('QA_PIXEL')
+
+tiene_nube_parana = [(int(v) & 8) > 0 for v in qa_parana]
+tiene_sombra_parana = [(int(v) & 16) > 0 for v in qa_parana]
+
+if not any(tiene_nube_parana) and not any(tiene_sombra_parana):
+    print("🟢 ¡Grilla 3x3 verificada y aprobada para procesamiento!")
+    
+    # =====================================================================
+    # PASO 3: Extración del pixel oscuro (Haze con Banda 1)
+    # =====================================================================
+    print("\n--- PASO 3: Calculando el Píxel Oscuro en la Laguna ---")
+    qa_band = imagen_perfecta.select('QA_PIXEL')
+    mascara_limpia = qa_band.bitwiseAnd(8).eq(0).And(qa_band.bitwiseAnd(16).eq(0))
+    banda1_laguna_limpia = imagen_perfecta.select('B1').updateMask(mascara_limpia)
+
+    haze_b1 = banda1_laguna_limpia.reduceRegion(
+        reducer=ee.Reducer.percentile([1]), # Percentil 1 
+        geometry=ROI_laguna,
+        scale=30
+    ).getInfo().get('B1')
+    
+    print(f"➡ Haze(Banda_1) = {haze_b1}")
+
+    # =====================================================================
+    # PASO 4: ASIGNAR EL VALOR DE K SEGÚN TUS CRITERIOS
+    # =====================================================================
+    print("\n--- PASO 4: Asignando la constante k del día ---")
+    if haze_b1 <= 0.035:
+        k = -4.0
+        estado_atm = "Muy claro"
+    elif 0.035 < haze_b1 <= 0.050:
+        k = -2.0
+        estado_atm = "Claro"
+    elif 0.050 < haze_b1 <= 0.065:
+        k = -1.0
+        estado_atm = "Moderado"
+    elif 0.065 < haze_b1 <= 0.085:
+        k = -0.7
+        estado_atm = "Brumoso"
+    else:
+        k = -0.5
+        estado_atm = "Muy brumoso"
+        
+    print(f"➡ Constante k asignada: {k} (Atmósfera: {estado_atm})")
+
+    # =====================================================================
+    # PASO 5: CALCULAR EL RUIDO (HAZE) PARA CADA BANDA
+    # =====================================================================
+    print("\n--- PASO 5: Calculando el Ruido Atmosférico por banda ---")
+    
+    # Longitudes de onda centrales oficiales de Landsat 8 (en micrómetros)
+    lambdas = {
+        'B1': 0.443, 'B2': 0.482, 'B3': 0.562, 'B4': 0.655, 
+        'B5': 0.865, 'B6': 1.609, 'B7': 2.201, 'B8': 0.590, 'B9': 1.373
+    }
+    
+    # Aplicamos tu ecuación matemática: Haze(Bi) = Haze(B1) * (Lambda_i / Lambda_1)^k
+    diccionario_ruido = {}
+    lambda_1 = lambdas['B1']
+    
+    for banda, lambda_i in lambdas.items():
+        ruido_banda = haze_b1 * ((lambda_i / lambda_1) ** k)
+        diccionario_ruido[banda] = ruido_banda
+        print(f" -> Ruido calculado para {banda}: {ruido_banda:.6f}")
+
+    # =====================================================================
+    # PASO 6: RESTRACCIÓN DEL RUIDO EN TU GRILLA 3X3 DEL RÍO PARANÁ
+    # =====================================================================
+    print("\n--- PASO 6: Aplicando corrección y exportando datos ---")
+    
+    bandas_interes = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11', 'QA_PIXEL']
+    imagen_seleccionada = imagen_perfecta.select(bandas_interes)
+
+    # Crear la vecindad matricial de 3x3
+    kernel = ee.Kernel.rectangle(xRadius=1, yRadius=1, units='pixels')
+    imagen_grilla = imagen_seleccionada.neighborhoodToArray(kernel)
+
+    # Extraer las matrices numéricas en el punto del Paraná
+    valores_reducidos = imagen_grilla.reduceRegion(
+        reducer=ee.Reducer.first(),
+        geometry=punto_parana,
+        scale=30
+    ).getInfo()
+
+    matriz_base = np.array(valores_reducidos.get('B1'))
+    filas, columnas = matriz_base.shape
+
+    lista_pixeles = []
+
+    for i in range(filas):
+        for j in range(columnas):
+            datos_pixel = {
+                'Fila_Grilla': i + 1,
+                'Columna_Grilla': j + 1
+            }
+            
+            # Recorrer cada banda para extraer el valor original y corregirlo
+            for banda in bandas_interes:
+                matriz_banda = valores_reducidos.get(banda)
+                
+                if matriz_banda is not None:
+                    valor_original = matriz_banda[i][j]
+                    
+                    # Si la banda tiene ruido calculado (B1 a B9), se lo restamos
+                    if banda in diccionario_ruido:
+                        ruido = diccionario_ruido[banda]
+                        # Corrección: Valor Corregido = Valor Original - Ruido
+                        # Usamos max(0, ...) para evitar reflectancias negativas irreales
+                        datos_pixel[banda + "_Original"] = valor_original
+                        datos_pixel[banda + "_Corregido"] = max(0.0, valor_original - ruido)
+                    else:
+                        # Para B10, B11 (térmicas) y QA_PIXEL no aplica tu fórmula de haze solar
+                        datos_pixel[banda] = valor_original
+                else:
+                    datos_pixel[banda] = None
+                    
+            lista_pixeles.append(datos_pixel)
+
+    # Crear el DataFrame de Pandas y exportar a CSV
+    df = pd.DataFrame(lista_pixeles)
+    archivo_salida = "grilla_3x3_corregida_DOS.csv"
+    df.to_csv(archivo_salida, index=False)
+
+    print("=" * 85)
+    print("📊 RESULTADOS FINALES DE LA GRILLA 3X3 CORREGIDA ATMÓSFERICAMENTE")
+    print("=" * 85)
+    # Mostramos las columnas principales ordenadas para que sea scannable
+    columnas_visibles = ['Fila_Grilla', 'Columna_Grilla', 'B1_Original', 'B1_Corregido', 'B2_Original', 'B2_Corregido', 'B3_Original', 'B3_Corregido']
+    print(df[columnas_visibles].to_string(index=False))
+    print("=" * 85)
+    print(f"🟢 Archivo '{archivo_salida}' guardado exitosamente en tu directorio.")
+
+else:
+    print("❌ Error de contingencia: Esta imagen específica no pasó el control de nubes actual.")
+
+```
+
+firma especral
+
+```{python}
+#| echo: false
+import matplotlib.pyplot as plt
+import numpy as np
+
+# 1. Definir las bandas reflectivas y sus nombres para el eje X
+bandas_ref = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7']
+nombres_bandas = ['B1 (Costero)', 'B2 (Azul)', 'B3 (Verde)', 'B4 (Rojo)', 'B5 (NIR)', 'B6 (SWIR 1)', 'B7 (SWIR 2)']
+
+# 2. Calcular el promedio de los 9 píxeles para cada curva
+valores_originales = [df[f'{b}_Original'].mean() for b in bandas_ref]
+valores_corregidos = [df[f'{b}_Corregido'].mean() for b in bandas_ref]
+
+# 3. Configurar el tamaño y estilo del gráfico
+plt.figure(figsize=(10, 6))
+
+# Curva de Reflectancia Original (TOA)
+plt.plot(nombres_bandas, valores_originales, 
+         marker='o', linestyle='-', linewidth=2, color='#e74c3c', label='Original (TOA)')
+plt.fill_between(nombres_bandas, valores_originales, color='#e74c3c', alpha=0.1)
+
+# Curva de Reflectancia Corregida (BOA)
+plt.plot(nombres_bandas, valores_corregidos, 
+         marker='s', linestyle='--', linewidth=2, color='#2ce181', label='Corregida (DOS - con Banda 1 como base)')
+plt.fill_between(nombres_bandas, valores_corregidos, color='#2ce181', alpha=0.15)
+
+# 4. Personalización de ejes, títulos y diseño
+plt.title('Comparación de Firmas Espectrales en el Río Paraná\n(Promedio Grilla 3x3 - 17/08/2013)', 
+          fontsize=14, fontweight='bold', pad=15)
+plt.xlabel('Bandas Espectrales (Landsat 8)', fontsize=11, labelpad=10)
+plt.ylabel('Reflectancia (0.0 - 1.0)', fontsize=11, labelpad=10)
+
+# Ajustar el límite del eje Y un poco más arriba del máximo original para que luzca bien
+plt.ylim(0, max(valores_originales) * 1.2)
+
+# Añadir cuadrícula de fondo para facilitar la lectura de valores
+plt.grid(True, linestyle=':', alpha=0.6)
+
+# Posicionar la leyenda explicativa
+plt.legend(fontsize=11, loc='upper right')
+
+# Optimizar el espacio del gráfico para evitar recortes de texto
+plt.tight_layout()
+
+# 5. Guardar el gráfico como imagen de alta resolución y mostrarlo
+plt.savefig('comparacion_firma_espectral.png', dpi=300)
+plt.show()
+
+```
+
+
+## Corrección con B2 (Azul)
+
+
+```{python}
+#| echo: false
+#| output: false
+import pandas as pd
+import numpy as np
+import ee
+
+# Inicializar Google Earth Engine (Descomentar si es necesario)
+# ee.Initialize()
+
+# =====================================================================
+# REPASO DE GEOMETRÍAS (Para asegurar que estén en memoria)
+# =====================================================================
+punto_parana = ee.Geometry.Point([-58.874118, -27.479538])
+grilla_3x3 = punto_parana.buffer(45).bounds()
+
+lat_laguna = -28.000158252668115
+lon_laguna = -57.82968917552424
+punto_laguna_centro = ee.Geometry.Point([lon_laguna, lat_laguna])
+ROI_laguna = punto_laguna_centro.buffer(400).bounds()
+
+# =====================================================================
+# PASO 2: CARGA DE LA IMAGEN FIJA SELECCIONADA
+# =====================================================================
+print("--- PASO 2: Cargando la escena fija limpia ---")
+id_imagen = 'LANDSAT/LC08/C02/T1_TOA/LC08_226079_20130817'
+imagen_perfecta = ee.Image(id_imagen)
+
+# Verificar QA_PIXEL en el río Paraná (0% nubes/sombras)
+qa_parana = imagen_perfecta.select('QA_PIXEL').reduceRegion(
+    reducer=ee.Reducer.toList(),
+    geometry=grilla_3x3,
+    scale=30
+).getInfo().get('QA_PIXEL')
+
+tiene_nube_parana = [(int(v) & 8) > 0 for v in qa_parana]
+tiene_sombra_parana = [(int(v) & 16) > 0 for v in qa_parana]
+
+if not any(tiene_nube_parana) and not any(tiene_sombra_parana):
+    print("🟢 ¡Grilla 3x3 verificada y aprobada para procesamiento!")
+    
+        # =====================================================================
+    # PASO 3: EXTRAER EL PÍXEL OSCURO EN LA BANDA 2 (AZUL - SEGÚN CHAVEZ)
+    # =====================================================================
+    print("\n--- PASO 3: Calculando el Píxel Oscuro en la Banda 2 (Azul) ---")
+    qa_band = imagen_perfecta.select('QA_PIXEL')
+    mascara_limpia = qa_band.bitwiseAnd(8).eq(0).And(qa_band.bitwiseAnd(16).eq(0))
+    
+    # CAMBIO CRÍTICO: Seleccionamos la Banda 2 (B2) en lugar de la B1
+    banda2_laguna_limpia = imagen_perfecta.select('B2').updateMask(mascara_limpia)
+
+    haze_b2 = banda2_laguna_limpia.reduceRegion(
+        reducer=ee.Reducer.percentile([1]), 
+        geometry=ROI_laguna,
+        scale=30
+    ).getInfo().get('B2')
+    
+    print(f"➡ Haze(Banda_2_Azul) = {haze_b2}")
+
+    # =====================================================================
+    # PASO 4: CORRECCIÓN DE SIGNO EN K (FÍSICA DE RAYLEIGH STANDARD)
+    # =====================================================================
+    print("\n--- PASO 4: Asignando la constante k del día (Corregida) ---")
+    # Cambiamos los exponentes a POSITIVOS para que el ruido disminuya con la longitud de onda
+    if haze_b2 <= 0.030:
+        k = 4.0   # Antes -4.0
+        estado_atm = "Muy claro"
+    elif 0.030 < haze_b2 <= 0.045:
+        k = 2.0   # Antes -2.0
+        estado_atm = "Claro"
+    elif 0.045 < haze_b2 <= 0.060:
+        k = 1.0   # Antes -1.0
+        estado_atm = "Moderado"
+    elif 0.060 < haze_b2 <= 0.080:
+        k = 0.7   # Antes -0.7
+        estado_atm = "Brumoso"
+    else:
+        k = 0.5   # Antes -0.5
+        estado_atm = "Muy brumoso"
+        
+    print(f"➡ Constante k asignada: {k} (Atmósfera: {estado_atm})")
+
+    # =====================================================================
+    # PASO 5: CALCULAR EL RUIDO CON EXPO CORREGIDO
+    # =====================================================================
+    print("\n--- PASO 5: Calculando el Ruido Atmosférico por banda ---")
+    
+    lambdas = {
+        'B1': 0.443, 'B2': 0.482, 'B3': 0.562, 'B4': 0.655, 
+        'B5': 0.865, 'B6': 1.609, 'B7': 2.201, 'B8': 0.590, 'B9': 1.373
+    }
+    
+    diccionario_ruido = {}
+    lambda_2 = lambdas['B2'] 
+    
+    for banda, lambda_i in lambdas.items():
+        # Al ser k positivo, el ruido decaerá en las bandas largas correctamente
+        ruido_banda = haze_b2 * ((lambda_i / lambda_2) ** k) # Nota el signo menos en el exponente para mantener la relación inversa
+        diccionario_ruido[banda] = ruido_banda
+        print(f" -> Ruido calculado para {banda}: {ruido_banda:.6f}")
+
+
+```
+
+Firma espectral
+
+```{python}
+#| echo: false
+import pandas as pd
+import numpy as np
+import ee
+import matplotlib.pyplot as plt
+
+
+# =====================================================================
+# 1. GEOMETRÍAS Y CARGA DE IMAGEN
+# =====================================================================
+punto_parana = ee.Geometry.Point([-58.874118, -27.479538])
+grilla_3x3 = punto_parana.buffer(45).bounds()
+
+# Laguna para pixel oscuro
+lat_nueva_laguna = -28.000158252668115
+lon_nueva_laguna = -57.82968917552424
+punto_control_nuevo = ee.Geometry.Point([lon_nueva_laguna, lat_nueva_laguna])
+ROI_laguna = punto_control_nuevo.buffer(250).bounds()
+
+id_imagen = 'LANDSAT/LC08/C02/T1_TOA/LC08_226079_20130817'
+imagen_perfecta = ee.Image(id_imagen)
+
+# =====================================================================
+# 2. EXTRACCIÓN DEL PÍXEL OSCURO EN BANDA 2 (AZUL)
+# =====================================================================
+qa_band = imagen_perfecta.select('QA_PIXEL')
+mascara_limpia = qa_band.bitwiseAnd(8).eq(0).And(qa_band.bitwiseAnd(16).eq(0))
+banda2_laguna_limpia = imagen_perfecta.select('B2').updateMask(mascara_limpia)
+
+haze_b2 = banda2_laguna_limpia.reduceRegion(
+    reducer=ee.Reducer.percentile([1]), 
+    geometry=ROI_laguna,
+    scale=30
+).getInfo().get('B2')
+
+# =====================================================================
+# 3. ASIGNACIÓN DE K (EXPONENTE POSITIVO DE DISPERSIÓN DE RAYLEIGH)
+# =====================================================================
+if haze_b2 <= 0.030:
+    k = -4.0   
+elif 0.030 < haze_b2 <= 0.045:
+    k = -2.0   
+elif 0.045 < haze_b2 <= 0.060:
+    k = -1.0   
+elif 0.060 < haze_b2 <= 0.080:
+    k = -0.7   
+else:
+    k = -0.5   
+
+# =====================================================================
+# 4. CÁLCULO DEL RUIDO (DIVISIÓN EXPONENCIAL DIRECTA COHERENTE)
+# =====================================================================
+lambdas = {
+    'B1': 0.443, 'B2': 0.482, 'B3': 0.562, 'B4': 0.655, 
+    'B5': 0.865, 'B6': 1.609, 'B7': 2.201,
+    'B8': 0.590,  # Pancromática (Rango 0.500 - 0.680)
+    'B9': 1.375   # Cirrus (Rango 1.360 - 1.390)
+}
+
+diccionario_ruido = {}
+lambda_2 = lambdas['B2'] 
+
+for banda, lambda_i in lambdas.items():
+    # USAMOS DIVISIÓN: El ruido disminuye drásticamente en los colores de onda larga
+    ruido_banda = haze_b2 * ((lambda_i / lambda_2) ** k) 
+    diccionario_ruido[banda] = ruido_banda
+
+# =====================================================================
+# 5. RESTRACCIÓN DEL RUIDO EN LA GRILLA 3X3 DEL PARANÁ
+# =====================================================================
+bandas_interes = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11', 'QA_PIXEL']
+imagen_seleccionada = imagen_perfecta.select(bandas_interes)
+
+kernel = ee.Kernel.rectangle(xRadius=1, yRadius=1, units='pixels')
+imagen_grilla = imagen_seleccionada.neighborhoodToArray(kernel)
+
+valores_reducidos = imagen_grilla.reduceRegion(
+    reducer=ee.Reducer.first(),
+    geometry=punto_parana,
+    scale=30
+).getInfo()
+
+matriz_base = np.array(valores_reducidos.get('B1'))
+filas, columnas = matriz_base.shape
+
+lista_pixeles = []
+
+for i in range(filas):
+    for j in range(columnas):
+        datos_pixel = {'Fila_Grilla': i + 1, 'Columna_Grilla': j + 1}
+        for banda in bandas_interes:
+            matriz_banda = valores_reducidos.get(banda)
+            if matriz_banda is not None:
+                valor_original = matriz_banda[i][j]
+                if banda in diccionario_ruido:
+                    ruido = diccionario_ruido[banda]
+                    datos_pixel[banda + "_Original"] = valor_original
+                    datos_pixel[banda + "_Corregido"] = max(0.0, valor_original - ruido)
+                else:
+                    datos_pixel[banda] = valor_original
+            else:
+                datos_pixel[banda] = None
+        lista_pixeles.append(datos_pixel)
+
+df_nuevo = pd.DataFrame(lista_pixeles)
+
+# =====================================================================
+# 6. GENERACIÓN DEL GRÁFICO INSTANTÁNEO
+# =====================================================================
+bandas_ref = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9' ]
+nombres_bandas = ['B1 (Costero)', 'B2 (Azul)', 'B3 (Verde)', 'B4 (Rojo)', 'B5 (NIR)', 'B6 (SWIR 1)', 'B7 (SWIR 2)', 'B8 (PANCHRO)', 'B9 (CIRRUS)']
+
+valores_originales = [df_nuevo[f'{b}_Original'].mean() for b in bandas_ref]
+valores_corregidos = [df_nuevo[f'{b}_Corregido'].mean() for b in bandas_ref]
+
+plt.figure(figsize=(10, 6))
+plt.plot(nombres_bandas, valores_originales, marker='o', linestyle='-', linewidth=2, color='#e74c3c', label='Original (TOA)')
+plt.fill_between(nombres_bandas, valores_originales, color='#e74c3c', alpha=0.1)
+
+plt.plot(nombres_bandas, valores_corregidos, marker='s', linestyle='--', linewidth=2, color='#2ce181', label='Corregida')
+plt.fill_between(nombres_bandas, valores_corregidos, color='#2ce181', alpha=0.15)
+
+plt.title('Comparación de Firmas Espectrales en el Río Paraná\n(Promedio pixeles 3x3 - 17/08/2013)', fontsize=13, fontweight='bold', pad=15)
+plt.xlabel('Bandas Espectrales (Landsat 8)', fontsize=11, labelpad=10)
+plt.ylabel('Reflectancia Superficial', fontsize=11, labelpad=10)
+plt.ylim(0, max(valores_originales) * 1.2)
+plt.grid(True, linestyle=':', alpha=0.6)
+plt.legend(fontsize=11, loc='upper right')
+plt.tight_layout()
+plt.show()
 
 
 ```
 
 
 
+# Estimacion de Turbidez con modelo XGBOOST del 2025
 
-#
+Defino 2 puntos de interés, sobre el río paraná
+
+- Punto 1 (Chaco) 
+- Punto 2 (Corrientes)
+
+```{python}
+#| code-fold: true
+import ee
+import pandas as pd
+
+# Inicializar con tu proyecto
+ee.Initialize(project='gistaq-2026')
+
+# 1. Definir los puntos de interés
+punto_1 = ee.Geometry.Point([-58.86813681183558, -27.46512351698905])
+punto_2 = ee.Geometry.Point([-58.8582877403329, -27.473538528861454])
+
+# punto_1 (Chaco) , punto_2 (Corrientes)
+```
+
+Ubicación de los puntos
+
+```{python}
+#| echo: false
+#| label: mapa-puntos-turbidez
+#| eval: false
+import ee
+import geemap
+
+puntos = ee.FeatureCollection([
+    ee.Feature(punto_1, {'nombre': 'Punto 1'}),
+    ee.Feature(punto_2, {'nombre': 'Punto 2'})
+])
+
+m = geemap.Map(backend="folium")
+
+m.centerObject(puntos , zoom=13)
+
+# Agrego el Punto 1 (Chaco) en color Rojo
+m.addLayer(
+    ee.Feature(punto_1), 
+    {'color': 'red'}, 
+    'Punto Rojo (Chaco)'
+)
+
+# Agrego el Punto 2 (Corrientes) en color Azul
+
+m.addLayer(
+    ee.Feature(punto_2), 
+    {'color': 'blue'}, 
+    'Punto Azul (Corrientes)'
+)
+
+# Guardo el mapa localmente como un archivo HTML estático 
+m.to_html("D:/Monitoreo 2026/Output/mapas/mapa_puntos_turbidez.html")
+
+m
+```
+
+<iframe src="Output\mapas\mapa_puntos_turbidez.html" width="100%" height="500px" style="border: none;"></iframe>
 
 
-#
+Importo imágenes de Sentinel-2
+
+```{python}
+#| code-fold: true
+#| output: false
+
+# 2. Agrupo los puntos
+puntos_busqueda = ee.FeatureCollection([
+    ee.Feature(punto_1, {'id_simple': 1}),
+    ee.Feature(punto_2, {'id_simple': 2})
+])
+
+# Mapeo de bandas de GEE hacia las columnas del modelo
+bandas_gee = ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B11", "B12", "B8A"]
+bandas_modelo = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B11", "B12", "B8A"]
+
+# 3. Filtro la colección por fecha y lugar
+coleccion = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+             .filterDate('2023-01-01', '2025-12-31')
+             .filterBounds(puntos_busqueda))
+
+# 4. Función interna para extraer los datos de cada imagen de la serie
+def extraer_datos_por_imagen(img):
+    fecha = img.date().format('YYYY-MM-DD')
+    
+    return img.select(bandas_gee + ["SCL"]).reduceRegions(
+        collection=puntos_busqueda,
+        reducer=ee.Reducer.first(),
+        scale=10
+    ).map(lambda f: f.set('fecha_captura', fecha))
+
+# 5. Aplicar la función a toda la colección y aplanar los resultados
+valores_historicos = coleccion.map(extraer_datos_por_imagen).flatten()
+
+print("Descargando serie temporal desde Earth Engine...")
+datos_extraidos = valores_historicos.getInfo()['features']
+
+# Lista para almacenar las filas válidas
+filas_validas = []
+
+for feature in datos_extraidos:
+    propiedades = feature['properties']
+    clase_scl = propiedades.get('SCL')
+    
+    # Evaluar el SCL (Valor 6 = Agua)
+    if clase_scl == 6:
+        registro_pixel = {
+            'Fecha': propiedades.get('fecha_captura'),
+            'Punto': propiedades.get('id_simple') # Aquí se guarda solo 1 o 2
+        }
+        
+        # Mapear nombres de bandas y dividir por 10,000
+        for b_gee, b_mod in zip(bandas_gee, bandas_modelo):
+            valor_original = propiedades.get(b_gee)
+            if valor_original is not None:
+                registro_pixel[b_mod] = valor_original / 10000.0
+            else:
+                registro_pixel[b_mod] = 0.0
+                
+        filas_validas.append(registro_pixel)
+
+# 6. Crear el DataFrame y exportarlo a CSV
+if filas_validas:
+    # Definimos el orden de las columnas con los metadatos al inicio
+    columnas_csv = ['Fecha', 'Punto'] + bandas_modelo
+    df = pd.DataFrame(filas_validas, columns=columnas_csv)
+    
+    nombre_archivo = "serie_temporal_turbidez_final.csv"
+    df.to_csv(nombre_archivo, index=False)
+    
+    print(f"\n¡Éxito! Archivo '{nombre_archivo}' generado correctamente.")
+    print("\nNueva vista previa del contenido del CSV:")
+    print(df.head().to_string(index=False))
+else:
+    print("No se encontraron registros de agua limpia en ese periodo.")
+
+```
+
+Estimacion de la turbidez
+
+```{python}
+#| code-fold: true
+#| output: false
+import pandas as pd
+import xgboost as xgb
+import os
+
+# 1. Rutas de tus archivos
+ruta_modelo = r"D:\Monitoreo 2026\Output\Modelo de Turbidez 2025\modelo_xgboost_optuna.json"
+nombre_entrada = "serie_temporal_turbidez_final.csv"
+nombre_salida = "resultados_turbidez_final.csv"
+
+# 2. Cargar el CSV con las reflectancias de Sentinel-2
+if not os.path.exists(nombre_entrada):
+    raise FileNotFoundError(f"No se encontró el archivo {nombre_entrada}. Asegúrate de ejecutar primero el script de Earth Engine.")
+
+df_datos = pd.read_csv(nombre_entrada)
+
+# 3. Inicializar y cargar tu modelo XGBoost entrenado con Optuna
+print("Cargando modelo XGBoost...")
+modelo = xgb.XGBRegressor()
+modelo.load_model(ruta_modelo)
+
+# 4. Seleccionar estrictamente las columnas con las que se entrenó el modelo
+bandas_modelo = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B11", "B12", "B8A"]
+X_prediccion = df_datos[bandas_modelo]
+
+print(f"Calculando turbidez para {len(df_datos)} registros...")
+
+# 5. Realizar la predicción e integrar el resultado al DataFrame
+df_datos['Turbidez_Estimada'] = modelo.predict(X_prediccion)
+
+# 6. Exportar los resultados a un nuevo archivo CSV
+df_datos.to_csv(nombre_salida, index=False)
+print(f"¡Proceso terminado! Archivo guardado correctamente en: {os.path.abspath(nombre_salida)}")
+
+# 7. Mostrar una vista previa de las estimaciones en pantalla
+print("\nVista previa de las predicciones:")
+columnas_vista = ['Fecha', 'Punto', 'Turbidez_Estimada']
+print(df_datos[columnas_vista].head().to_string(index=False))
+
+```
+
+Gráfico de estimación de la turbidez 
+
+```{python}
+#| echo: false
+#| output: false
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+
+# 1. Ruta exacta de tu archivo CSV
+ruta_csv = r"D:\Monitoreo 2026\resultados_turbidez_final.csv"
+
+if not os.path.exists(ruta_csv):
+    raise FileNotFoundError(f"No se encontró el archivo en la ruta: {ruta_csv}")
+
+# 2. Cargar los datos
+df_datos = pd.read_csv(ruta_csv)
+
+# 3. FUNCIÓN DE LIMPIEZA AVANZADA: Reconstruir las fechas rotas
+def corregir_fecha_gee(cadena_fecha):
+    try:
+        partes = str(cadena_fecha).split('-')
+        if len(partes) != 3:
+            return pd.NaT
+        
+        anio = partes[0]
+        # Tomamos el número final que GEE exportó como el "Día del año acumulado"
+        dia_del_anio = int(partes[2]) 
+        
+        # Reconstruir la fecha real a partir del año y el día consecutivo del año
+        fecha_real = pd.to_datetime(f"{anio}-{dia_del_anio}", format="%Y-%j")
+        return fecha_real
+    except:
+        return pd.NaT
+
+# Aplicar la corrección de fechas inteligente
+df_datos['Fecha'] = df_datos['Fecha'].apply(corregir_fecha_gee)
+df_datos = df_datos.dropna(subset=['Fecha'])
+
+# Asegurar que el resto de columnas sean numéricas
+df_datos['Punto'] = pd.to_numeric(df_datos['Punto'], errors='coerce')
+df_datos = df_datos.dropna(subset=['Punto'])
+
+df_datos['Turbidez_Estimada'] = pd.to_numeric(df_datos['Turbidez_Estimada'], errors='coerce')
+df_datos = df_datos.dropna(subset=['Turbidez_Estimada'])
+
+# Ordenar cronológicamente de forma correcta
+df_datos = df_datos.sort_values('Fecha')
+
+# 4. Separar los datos por cada punto (1 y 2)
+df_punto1 = df_datos[df_datos['Punto'] == 1]
+df_punto2 = df_datos[df_datos['Punto'] == 2]
+
+# 5. Configurar el tamaño y estilo del gráfico
+plt.figure(figsize=(14, 7))
+sns.set_theme(style="whitegrid")
+
+# 6. Dibujar la curva del Punto 1 (Línea azul con marcadores redondos)
+plt.plot(df_punto1['Fecha'], df_punto1['Turbidez_Estimada'], 
+         marker='o', linestyle='-', color='#1f77b4', linewidth=1.5, markersize=4, label='Punto 1')
+
+# 7. Dibujar la curva del Punto 2 (Línea naranja con marcadores cuadrados)
+plt.plot(df_punto2['Fecha'], df_punto2['Turbidez_Estimada'], 
+         marker='s', linestyle='-', color='#ff7f0e', linewidth=1.5, markersize=4, label='Punto 2')
+
+# 8. Personalizar etiquetas, títulos y leyenda
+plt.title('Turbidez Estimada (2023 - 2025)', fontsize=14, pad=15, fontweight='bold')
+plt.xlabel('Fecha', fontsize=12)
+plt.ylabel('Turbidez Estimada (NTU)', fontsize=12)
+plt.legend(title="Sitios de Monitoreo", fontsize=11)
+
+# 9. Formatear la visualización de las fechas en el eje X
+plt.gcf().autofmt_xdate()
+
+# 10. Guardar el gráfico como imagen en alta resolución
+ruta_guardado_grafico = r"D:\Monitoreo 2026\Output\gráficos\comparativa_turbidez_XGBoost2025.png"
+plt.savefig(ruta_guardado_grafico, dpi=300, bbox_inches='tight')
+
+# Mostrar el gráfico en pantalla
+plt.show()
+
+```
+
+![Gráfico de estimación de la turbidez](Output\gráficos\comparativa_turbidez_XGBoost2025.png){width="100%" fig-align="center"}
+   
+
+# Modelado algoritmo XG Boost para estimación de la turbidez
+
+Se entrenará un modelo de machine learning con valores de reflectancia de superficies de Sentinel-2 y datos de turbidez provenientes de la planta potabilizadora "La Toma" de SAMEEP, sobre el riacho Barranqueras.
+
+Trabajamos con la librería pandas para unir los datos de turbidez y de reflectancia en un único arcivo 
+
+
+```{python}
+#| code-fold: true
+import pandas as pd
+
+# Defino los DataFrame
+df1 = pd.read_csv(r"Input/tsv/sameep_historicos.tsv", sep='\t')
+df2 = pd.read_csv(r"Input/tsv/base_de_datos_gis.tsv", sep='\t')
+
+# Combino df1 y df2
+df_combinado = pd.merge(df1, df2, on=["fecha"], how="inner")
+
+# Filtro solo las filas que contegan turbidez
+df_turb = df_combinado[(df_combinado["param"] == "turbidez")]
+
+# Elimino las columnas que no nos interesan
+
+df_turb_band = df_turb.drop(columns=["fecha","param"])
+
+# Cambiamos el nombre de la columna "valor" por el de "turbidez
+
+df_turb_band.rename(columns={"valor": "turbidez"}, inplace=True)
+
+# Pivotamos la tabla
+
+df_final = df_turb_band.pivot_table(
+        index="turbidez",
+        columns="banda",
+        values="reflec",)
+
+# Creamos tabla final
+df_final.to_csv(r"D:\Monitoreo 2026\Output\csv\df_final.csv", index=True)
+```
+
+```{python}
+#| echo: false
+#| warning: false
+#| message: false
+import pandas as pd
+
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\df_final.csv")
+
+df.head()
+```
+
+
+# Entrenamiento del modelo con todas las bandas
+
+
+```{python}
+#| echo: false
+#| warning: false
+#| message: false
+#| eval: false
+#| label: entrenar_xgb_optuna
+
+# Entrenamiento del modelo
+
+from xgboost import XGBRegressor
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import r2_score, mean_squared_error
+import pandas as pd
+import numpy as np
+import optuna
+import os
+
+# Leer datos
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\df_final.csv")
+
+X = df[["B01","B02","B03","B04","B05","B06","B07","B08","B11","B12","B8A"]]
+y = df["turbidez"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=42
+)
+
+optuna.logging.set_verbosity(optuna.logging.WARNING)
+
+def objective(trial):
+
+    params = {
+        'max_depth': trial.suggest_int('max_depth', 3, 10),
+        'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.3),
+        'subsample': trial.suggest_float('subsample', 0.6, 1.0),
+        'colsample_bytree': trial.suggest_float('colsample_bytree', 0.6, 1.0),
+        'n_estimators': trial.suggest_int('n_estimators', 200, 800),
+        'random_state': 42
+    }
+
+    model = XGBRegressor(**params)
+    score = cross_val_score(model, X_train, y_train, scoring='r2', cv=5).mean()
+    return score
+
+study = optuna.create_study(direction='maximize')
+study.optimize(objective, n_trials=50)
+
+# Tabla con mejores hiperparámetros
+best_params_df = pd.DataFrame([study.best_params])
+best_params_df["R2_promedio_CV"] = study.best_value
+display(best_params_df)
+
+# Entrenar modelo final
+model = XGBRegressor(**study.best_params)
+model.fit(X_train, y_train)
+
+# Guardar modelo y parámetros
+ruta = r"D:\Monitoreo 2026\Output\Modelo XGBoost todas las bandas"
+os.makedirs(ruta, exist_ok=True)
+
+model.save_model(os.path.join(ruta, "modelo_xgboost_optuna.json"))
+best_params_df.to_csv(os.path.join(ruta, "xgb_optuna_params.csv"), index=False)
+
+```
+
+Tabla con hiperparámetros optimizados
+
+```{python}
+#| echo: false
+#| warning: false
+#| message: false
+#| label: tabla_optuna
+
+import pandas as pd
+
+params_path = r"D:\Monitoreo 2026\Output\Modelo XGBoost todas las bandas\xgb_optuna_params.csv"
+best_params_df = pd.read_csv(params_path)
+
+best_params_df
+
+```
+
+Cargo Modelo 
+
+```{python}
+#| echo: false
+#| warning: false
+#| message: false
+#| label: cargar_modelo_xgb_optuna
+
+# Carga el modelo entrenado
+
+from xgboost import XGBRegressor
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score, mean_squared_error
+
+# Cargar datos
+
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\df_final.csv")
+
+X = df[["B01","B02","B03","B04","B05","B06","B07","B08","B11","B12","B8A"]]
+y = df["turbidez"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+X, y, test_size=0.25, random_state=42
+)
+
+model = XGBRegressor()
+model.load_model(r"D:\Monitoreo 2026\Output\Modelo XGBoost todas las bandas\modelo_xgboost_optuna.json")
+
+# Predicciones
+
+y_train_pred = model.predict(X_train)
+y_test_pred = model.predict(X_test)
+
+# Métricas
+
+r2_train = r2_score(y_train, y_train_pred)
+rmse_train = np.sqrt(mean_squared_error(y_train, y_train_pred))
+
+r2_test = r2_score(y_test, y_test_pred)
+rmse_test = np.sqrt(mean_squared_error(y_test, y_test_pred))
+
+```
+
+Gráfica de métricas de desempeño
+
+```{python}
+#| echo: false
+#| warning: false
+#| message: false
+#| label: xgb_optuna_plot
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+plt.figure(figsize=(4.5, 4.5))
+
+plt.scatter(y_train, y_train_pred, color="#9D50A6", alpha=0.5,
+label="Datos de entrenamiento", marker='o')
+
+plt.scatter(y_test, y_test_pred, color="red", alpha=0.7,
+label="Datos de testeo", marker='^')
+
+min_val = min(np.min(y_train), np.min(y_test))
+max_val = max(np.max(y_train), np.max(y_test))
+
+plt.plot([min_val, max_val], [min_val, max_val], '--',
+color="#17A77E", lw=2, label="Línea ideal")
+
+coef = np.polyfit(y_test, y_test_pred, 1)
+x_t = np.linspace(min_val, max_val, 100)
+y_t = coef[0] * x_t + coef[1]
+plt.plot(x_t, y_t, '-', color='black', lw=2, label="Línea de tendencia (test)")
+
+plt.xlabel("Turbidez real (NTU)")
+plt.ylabel("Turbidez estimada (NTU)")
+
+plt.title(
+f"Modelo XGBoost optimizado (Optuna)\n"
+f"R² train: {r2_train:.3f}, RMSE:{rmse_train:.3f} | "
+f"R² test: {r2_test:.3f}, RMSE:{rmse_test:.3f}"
+)
+
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.tight_layout()
+plt.show()
+
+```
+
+# Entrenamiento del modelo exclueyndo bandas 1, 11 y 12 
+
+
+```{python}
+#| echo: false
+#| warning: false
+#| message: false
+#| eval: false
+#| label: entrenar_xgb_optuna2
+
+# Entrenamiento del modelo
+
+from xgboost import XGBRegressor
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import r2_score, mean_squared_error
+import pandas as pd
+import numpy as np
+import optuna
+import os
+
+# Leer datos
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\df_final.csv")
+
+X = df[["B02","B03","B04","B05","B06","B07","B08","B8A"]]
+y = df["turbidez"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=42
+)
+
+optuna.logging.set_verbosity(optuna.logging.WARNING)
+
+def objective(trial):
+
+    params = {
+        'max_depth': trial.suggest_int('max_depth', 3, 10),
+        'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.3),
+        'subsample': trial.suggest_float('subsample', 0.6, 1.0),
+        'colsample_bytree': trial.suggest_float('colsample_bytree', 0.6, 1.0),
+        'n_estimators': trial.suggest_int('n_estimators', 200, 800),
+        'random_state': 42
+    }
+
+    model = XGBRegressor(**params)
+    score = cross_val_score(model, X_train, y_train, scoring='r2', cv=5).mean()
+    return score
+
+study = optuna.create_study(direction='maximize')
+study.optimize(objective, n_trials=50)
+
+# Tabla con mejores hiperparámetros
+best_params_df = pd.DataFrame([study.best_params])
+best_params_df["R2_promedio_CV"] = study.best_value
+display(best_params_df)
+
+# Entrenar modelo final
+model = XGBRegressor(**study.best_params)
+model.fit(X_train, y_train)
+
+# Guardar modelo y parámetros
+ruta = r"D:\Monitoreo 2026\Output\Modelo XGBoost sin b1,11 y 12"
+os.makedirs(ruta, exist_ok=True)
+
+model.save_model(os.path.join(ruta, "modelo_xgboost_optuna.json"))
+best_params_df.to_csv(os.path.join(ruta, "xgb_optuna_params.csv"), index=False)
+
+```
+
+Tabla con hiperparámetros optimizados
+
+```{python}
+#| echo: false
+#| warning: false
+#| message: false
+#| label: tabla_optuna2
+
+import pandas as pd
+
+params_path = r"D:\Monitoreo 2026\Output\Modelo XGBoost sin b1,11 y 12\xgb_optuna_params.csv"
+best_params_df = pd.read_csv(params_path)
+
+best_params_df
+
+```
+
+Cargo Modelo 
+
+```{python}
+#| echo: false
+#| warning: false
+#| message: false
+#| label: cargar_modelo_xgb_optuna2
+
+# Carga el modelo entrenado
+
+from xgboost import XGBRegressor
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score, mean_squared_error
+
+# Cargar datos
+
+df = pd.read_csv(r"D:\Monitoreo 2026\Output\csv\df_final.csv")
+
+X = df[["B02","B03","B04","B05","B06","B07","B08","B8A"]]
+y = df["turbidez"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+X, y, test_size=0.25, random_state=42
+)
+
+model = XGBRegressor()
+model.load_model(r"D:\Monitoreo 2026\Output\Modelo XGBoost sin b1,11 y 12\modelo_xgboost_optuna.json")
+
+# Predicciones
+
+y_train_pred = model.predict(X_train)
+y_test_pred = model.predict(X_test)
+
+# Métricas
+
+r2_train = r2_score(y_train, y_train_pred)
+rmse_train = np.sqrt(mean_squared_error(y_train, y_train_pred))
+
+r2_test = r2_score(y_test, y_test_pred)
+rmse_test = np.sqrt(mean_squared_error(y_test, y_test_pred))
+
+```
+
+Gráfica de métricas de desempeño
+
+```{python}
+#| echo: false
+#| warning: false
+#| message: false
+#| label: xgb_optuna_plot2
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+plt.figure(figsize=(4.5, 4.5))
+
+plt.scatter(y_train, y_train_pred, color="#9D50A6", alpha=0.5,
+label="Datos de entrenamiento", marker='o')
+
+plt.scatter(y_test, y_test_pred, color="red", alpha=0.7,
+label="Datos de testeo", marker='^')
+
+min_val = min(np.min(y_train), np.min(y_test))
+max_val = max(np.max(y_train), np.max(y_test))
+
+plt.plot([min_val, max_val], [min_val, max_val], '--',
+color="#17A77E", lw=2, label="Línea ideal")
+
+coef = np.polyfit(y_test, y_test_pred, 1)
+x_t = np.linspace(min_val, max_val, 100)
+y_t = coef[0] * x_t + coef[1]
+plt.plot(x_t, y_t, '-', color='black', lw=2, label="Línea de tendencia (test)")
+
+plt.xlabel("Turbidez real (NTU)")
+plt.ylabel("Turbidez estimada (NTU)")
+
+plt.title(
+f"Modelo XGBoost optimizado (Optuna)\n"
+f"R² train: {r2_train:.3f}, RMSE:{rmse_train:.3f} | "
+f"R² test: {r2_test:.3f}, RMSE:{rmse_test:.3f}"
+)
+
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.tight_layout()
+plt.show()
+
+```
