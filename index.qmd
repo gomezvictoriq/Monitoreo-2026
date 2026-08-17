@@ -2858,7 +2858,7 @@ from xgboost import XGBRegressor
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 
 # Cargar datos
 
@@ -2879,15 +2879,27 @@ model.load_model(r"D:\Monitoreo 2026\Output\Modelo XGBoost todas las bandas\mode
 y_train_pred = model.predict(X_train)
 y_test_pred = model.predict(X_test)
 
+# Definición de MAAPE
+def calcular_maape(y_true, y_pred):
+    error_relativo = np.abs((y_true - y_pred) / (y_true))
+    return np.mean(np.arctan(error_relativo))*100
+
 # Métricas
 
+#Entrenamiento 
 r2_train = r2_score(y_train, y_train_pred)
 rmse_train = np.sqrt(mean_squared_error(y_train, y_train_pred))
+mae_train = mean_absolute_error(y_train, y_train_pred)         
+maape_train = calcular_maape(y_train, y_train_pred) 
 
+# Testeo
 r2_test = r2_score(y_test, y_test_pred)
 rmse_test = np.sqrt(mean_squared_error(y_test, y_test_pred))
+mae_test = mean_absolute_error(y_test, y_test_pred)           
+maape_test = calcular_maape(y_test, y_test_pred) 
 
 ```
+
 
 Gráfica de métricas de desempeño
 
@@ -2924,9 +2936,11 @@ plt.xlabel("Turbidez real (NTU)")
 plt.ylabel("Turbidez estimada (NTU)")
 
 plt.title(
-f"Modelo XGBoost optimizado (Optuna)\n"
-f"R² train: {r2_train:.3f}, RMSE:{rmse_train:.3f} | "
-f"R² test: {r2_test:.3f}, RMSE:{rmse_test:.3f}"
+    f"Modelo XGBoost optimizado (Optuna)\n"
+    f"Train -> R²: {r2_train:.3f} | RMSE: {rmse_train:.2f} NTU | MAE: {mae_train:.2f} NTU | MAAPE: {maape_train:.2f}%\n"
+    f"Test  -> R²: {r2_test:.3f} | RMSE: {rmse_test:.2f} NTU | MAE: {mae_test:.2f} NTU | MAAPE: {maape_test:.2f}%",
+    fontsize=10, 
+    loc='center'
 )
 
 plt.legend()
@@ -2936,8 +2950,7 @@ plt.show()
 
 ```
 
-# Entrenamiento del modelo exclueyndo bandas 1, 11 y 12 
-
+# Entrenamiento del modelo excluyendo bandas 1, 11 y 12 
 
 ```{python}
 #| echo: false
@@ -3056,13 +3069,24 @@ model.load_model(r"D:\Monitoreo 2026\Output\Modelo XGBoost sin b1,11 y 12\modelo
 y_train_pred = model.predict(X_train)
 y_test_pred = model.predict(X_test)
 
+# Definición de MAAPE
+def calcular_maape(y_true, y_pred):
+    error_relativo = np.abs((y_true - y_pred) / (y_true))
+    return np.mean(np.arctan(error_relativo))*100
+
 # Métricas
 
+#Entrenamiento 
 r2_train = r2_score(y_train, y_train_pred)
 rmse_train = np.sqrt(mean_squared_error(y_train, y_train_pred))
+mae_train = mean_absolute_error(y_train, y_train_pred)         
+maape_train = calcular_maape(y_train, y_train_pred) 
 
+# Testeo
 r2_test = r2_score(y_test, y_test_pred)
 rmse_test = np.sqrt(mean_squared_error(y_test, y_test_pred))
+mae_test = mean_absolute_error(y_test, y_test_pred)           
+maape_test = calcular_maape(y_test, y_test_pred) 
 
 ```
 
@@ -3101,9 +3125,11 @@ plt.xlabel("Turbidez real (NTU)")
 plt.ylabel("Turbidez estimada (NTU)")
 
 plt.title(
-f"Modelo XGBoost optimizado (Optuna)\n"
-f"R² train: {r2_train:.3f}, RMSE:{rmse_train:.3f} | "
-f"R² test: {r2_test:.3f}, RMSE:{rmse_test:.3f}"
+    f"Modelo XGBoost optimizado (Optuna)\n"
+    f"Train -> R²: {r2_train:.3f} | RMSE: {rmse_train:.2f} NTU | MAE: {mae_train:.2f} NTU | MAAPE: {maape_train:.2f}%\n"
+    f"Test  -> R²: {r2_test:.3f} | RMSE: {rmse_test:.2f} NTU | MAE: {mae_test:.2f} NTU | MAAPE: {maape_test:.2f}%",
+    fontsize=10, 
+    loc='center'
 )
 
 plt.legend()
