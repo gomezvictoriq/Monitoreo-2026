@@ -1,0 +1,26 @@
+---
+title: "Pestaña3"
+
+brand: _brand.yml
+freeze: auto
+
+format: 
+  html:
+    number-sections: true
+    toc: true
+    toc-title: "<img src='img/logo-gistaq.png' style='width:100%; max-width:120px; display:block; margin-bottom:15px;'> Índice"
+    toc-width: "18%"
+    toc-location: left
+    embed-resources: false
+    crossrefs-hover: false
+    lang: es
+    bibliography: bibliografia/bibliografia.bib
+    csl: bibliografia/ieee.csl
+    page-layout: full
+    theme: 
+      - default
+      - brand
+
+---     
+ 
+# Próximamente

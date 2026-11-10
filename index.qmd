@@ -1,7 +1,6 @@
 ---
 title: "Monitoreo 2026"
 
-
 brand: _brand.yml
 freeze: auto
 
@@ -23,7 +22,6 @@ format:
       - default
       - brand
     
-
 
 date: last-modified
 author:

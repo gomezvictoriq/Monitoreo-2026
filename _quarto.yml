@@ -1,0 +1,28 @@
+project:
+  type: website
+  render:
+    - index.qmd
+    - pestaña1.qmd
+    - pestaña2.qmd
+    - pestaña3.qmd
+
+website:
+  title: "Monitoreo 2026"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Página de inicio
+      - href: pestaña1.qmd
+        text: Relevamiento de datos
+      - href: pestaña2.qmd
+        text: Página Vacía 2
+      - href: pestaña3.qmd
+        text: Página Vacía 3
+
+brand: _brand.yml
+
+format:
+  html:
+    toc: true
+
+
