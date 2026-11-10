@@ -1952,7 +1952,6 @@ if imagen_perfecta is not None:
 else:
     print("❌ Error: No se encontró ninguna imagen completamente libre de nubes/sombras en el rango de fechas.")
 
-
 ```
 
 Buscamos una imagen limpia para probar 
@@ -1960,8 +1959,6 @@ Buscamos una imagen limpia para probar
 la imagen de prueba es la 
 
 LANDSAT/LC08/C02/T1_TOA/LC08_226079_20130817
-
-
 
 
 ## Corrección con B1 (Aerosol costero)
@@ -2680,11 +2677,11 @@ sns.set_theme(style="whitegrid")
 
 # 6. Dibujar la curva del Punto 1 (Línea azul con marcadores redondos)
 plt.plot(df_punto1['Fecha'], df_punto1['Turbidez_Estimada'], 
-         marker='o', linestyle='-', color='#1f77b4', linewidth=1.5, markersize=4, label='Punto 1')
+         marker='o', linestyle='-', color='#ff0000', linewidth=1.5, markersize=4, label='Punto 1 - Chaco')
 
 # 7. Dibujar la curva del Punto 2 (Línea naranja con marcadores cuadrados)
 plt.plot(df_punto2['Fecha'], df_punto2['Turbidez_Estimada'], 
-         marker='s', linestyle='-', color='#ff7f0e', linewidth=1.5, markersize=4, label='Punto 2')
+         marker='s', linestyle='-', color='#1100ff', linewidth=1.5, markersize=4, label='Punto 2 - Corrientes')
 
 # 8. Personalizar etiquetas, títulos y leyenda
 plt.title('Turbidez Estimada (2023 - 2025)', fontsize=14, pad=15, fontweight='bold')
@@ -2760,7 +2757,6 @@ df.head()
 
 
 # Entrenamiento del modelo con todas las bandas
-
 
 ```{python}
 #| echo: false
@@ -2897,9 +2893,7 @@ r2_test = r2_score(y_test, y_test_pred)
 rmse_test = np.sqrt(mean_squared_error(y_test, y_test_pred))
 mae_test = mean_absolute_error(y_test, y_test_pred)           
 maape_test = calcular_maape(y_test, y_test_pred) 
-
 ```
-
 
 Gráfica de métricas de desempeño
 
@@ -2950,7 +2944,7 @@ plt.show()
 
 ```
 
-# Entrenamiento del modelo excluyendo bandas 1, 11 y 12 
+# Entrenamiento del modelo excluyendo bandas 1, 11 y 12
 
 ```{python}
 #| echo: false
@@ -2984,24 +2978,25 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 def objective(trial):
 
     params = {
-        'max_depth': trial.suggest_int('max_depth', 3, 10),
+        'max_depth': trial.suggest_int('max_depth', 3, 6),
         'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.3),
         'subsample': trial.suggest_float('subsample', 0.6, 1.0),
         'colsample_bytree': trial.suggest_float('colsample_bytree', 0.6, 1.0),
         'n_estimators': trial.suggest_int('n_estimators', 200, 800),
+        'min_child_weight': trial.suggest_int('min_child_weight', 3, 15),
         'random_state': 42
     }
 
     model = XGBRegressor(**params)
-    score = cross_val_score(model, X_train, y_train, scoring='r2', cv=5).mean()
+    score = -cross_val_score(model, X_train, y_train, scoring='neg_root_mean_squared_error', cv=5).mean()
     return score
 
-study = optuna.create_study(direction='maximize')
+study = optuna.create_study(direction='minimize')
 study.optimize(objective, n_trials=50)
 
 # Tabla con mejores hiperparámetros
 best_params_df = pd.DataFrame([study.best_params])
-best_params_df["R2_promedio_CV"] = study.best_value
+best_params_df["rmse"] = study.best_value
 display(best_params_df)
 
 # Entrenar modelo final
@@ -3017,7 +3012,7 @@ best_params_df.to_csv(os.path.join(ruta, "xgb_optuna_params.csv"), index=False)
 
 ```
 
-Tabla con hiperparámetros optimizados
+Tabla con hiperparámetros optimizados 
 
 ```{python}
 #| echo: false
@@ -3034,7 +3029,7 @@ best_params_df
 
 ```
 
-Cargo Modelo 
+Cargo modelo 
 
 ```{python}
 #| echo: false
@@ -3048,7 +3043,7 @@ from xgboost import XGBRegressor
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.metrics import r2_score, mean_squared_error,mean_absolute_error
 
 # Cargar datos
 
@@ -3098,7 +3093,6 @@ Gráfica de métricas de desempeño
 #| message: false
 #| label: xgb_optuna_plot2
 
-
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -3138,3 +3132,875 @@ plt.tight_layout()
 plt.show()
 
 ```
+
+
+## Estimación sobre el río Paraná a partir del modelo sin Bandas 1,11 y 12 de Sentinel-2
+
+Defino 2 puntos de interés, sobre el río paraná
+
+- Punto 1 (Chaco) 
+- Punto 2 (Corrientes)
+
+```{python}
+#| code-fold: true
+import ee
+import pandas as pd
+
+# Inicializar con tu proyecto
+ee.Initialize(project='gistaq-2026')
+
+# 1. Definir los puntos de interés
+punto_1 = ee.Geometry.Point([-58.86813681183558, -27.46512351698905])
+punto_2 = ee.Geometry.Point([-58.8582877403329, -27.473538528861454])
+
+# punto_1 (Chaco) , punto_2 (Corrientes)
+```
+
+Ubicación de los puntos
+
+```{python}
+#| echo: false
+#| label: mapa-puntos-turbidez2
+#| eval: false
+import ee
+import geemap
+
+puntos = ee.FeatureCollection([
+    ee.Feature(punto_1, {'nombre': 'Punto 1'}),
+    ee.Feature(punto_2, {'nombre': 'Punto 2'})
+])
+
+m = geemap.Map(backend="folium")
+
+m.centerObject(puntos , zoom=13)
+
+# Agrego el Punto 1 (Chaco) en color Rojo
+m.addLayer(
+    ee.Feature(punto_1), 
+    {'color': '#ff0000'}, 
+    'Punto Rojo (Chaco)'
+)
+
+# Agrego el Punto 2 (Corrientes) en color Azul
+
+m.addLayer(
+    ee.Feature(punto_2), 
+    {'color': '#1100ff'}, 
+    'Punto Azul (Corrientes)'
+)
+
+# Guardo el mapa localmente como un archivo HTML estático 
+m.to_html("D:\Monitoreo 2026\Output\Modelo XGBoost sin b1,11 y 12\mapa_puntos_turbidezXGB.html")
+
+m
+```
+
+<iframe src="Output\Modelo XGBoost sin b1,11 y 12\mapa_puntos_turbidezXGB.html" width="100%" height="500px" style="border: none;"></iframe>
+
+
+Importo imágenes de Sentinel-2
+
+```{python}
+#| code-fold: true
+#| output: false
+import ee
+from pathlib import Path
+
+# 2. Agrupo los puntos
+puntos_busqueda = ee.FeatureCollection([
+    ee.Feature(punto_1, {'id_simple': 1}),
+    ee.Feature(punto_2, {'id_simple': 2})
+])
+
+# Mapeo de bandas de GEE hacia las columnas del modelo
+bandas_gee = ["B2", "B3", "B4", "B5", "B6", "B7", "B8", "B8A"]
+bandas_modelo = ["B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A"]
+
+# 3. Filtro la colección por fecha y lugar
+coleccion = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+             .filterDate('2025-01-01', '2026-07-31')
+             .filterBounds(puntos_busqueda))
+
+# 4. Función interna para extraer los datos de cada imagen de la serie
+def extraer_datos_por_imagen(img):
+    fecha = img.date().format('YYYY-MM-DD')
+    
+    return img.select(bandas_gee + ["SCL"]).reduceRegions(
+        collection=puntos_busqueda,
+        reducer=ee.Reducer.first(),
+        scale=10
+    ).map(lambda f: f.set('fecha_captura', fecha))
+
+# 5. Aplicar la función a toda la colección y aplanar los resultados
+valores_historicos = coleccion.map(extraer_datos_por_imagen).flatten()
+
+print("Descargando serie temporal desde Earth Engine...")
+datos_extraidos = valores_historicos.getInfo()['features']
+
+# Lista para almacenar las filas válidas
+filas_validas = []
+
+for feature in datos_extraidos:
+    propiedades = feature['properties']
+    clase_scl = propiedades.get('SCL')
+    
+    # Evaluar el SCL (Valor 6 = Agua)
+    if clase_scl == 6:
+        registro_pixel = {
+            'Fecha': propiedades.get('fecha_captura'),
+            'Punto': propiedades.get('id_simple') # Aquí se guarda solo 1 o 2
+        }
+        
+        # Mapear nombres de bandas y dividir por 10,000
+        for b_gee, b_mod in zip(bandas_gee, bandas_modelo):
+            valor_original = propiedades.get(b_gee)
+            if valor_original is not None:
+                registro_pixel[b_mod] = valor_original / 10000.0
+            else:
+                registro_pixel[b_mod] = 0.0
+                
+        filas_validas.append(registro_pixel)
+
+# 6. Crear el DataFrame y exportarlo a CSV
+if filas_validas:
+    # Definimos el orden de las columnas con los metadatos al inicio
+    columnas_csv = ['Fecha', 'Punto'] + bandas_modelo
+    df = pd.DataFrame(filas_validas, columns=columnas_csv)
+    
+    ruta_carpeta = Path(r"D:\Monitoreo 2026\Output\Modelo XGBoost sin b1,11 y 12\Reflectancias Sentinel-2 2025.csv")
+
+    
+    df.to_csv(ruta_carpeta, index=False)
+    
+    
+    print("\nNueva vista previa del contenido del CSV:")
+    print(df.head().to_string(index=False))
+else:
+    print("No se encontraron registros de agua limpia en ese periodo.")
+
+```
+
+EstimaciÓn de la turbidez
+
+```{python}
+#| code-fold: true
+#| output: false
+import pandas as pd
+import xgboost as xgb
+import os
+
+# 1. Rutas de tus archivos
+
+ruta_modelo = r"D:\Monitoreo 2026\Output\Estimaciones turbidez XBG 2026\modelo_xgboost_optuna.json"
+nombre_entrada = r"D:\Monitoreo 2026\Output\Modelo XGBoost sin b1,11 y 12\Reflectancias Sentinel-2 2025.csv"
+nombre_salida = r"D:\Monitoreo 2026\Output\Modelo XGBoost sin b1,11 y 12\Turbidez.csv"
+
+# 2. Cargar el CSV con las reflectancias de Sentinel-2
+if not os.path.exists(nombre_entrada):
+    raise FileNotFoundError(f"No se encontró el archivo {nombre_entrada}. Asegúrate de ejecutar primero el script de Earth Engine.")
+
+df_datos = pd.read_csv(nombre_entrada)
+
+# 3. Inicializar y cargar tu modelo XGBoost entrenado con Optuna
+print("Cargando modelo XGBoost...")
+modelo = xgb.XGBRegressor()
+modelo.load_model(ruta_modelo)
+
+# 4. Seleccionar estrictamente las columnas con las que se entrenó el modelo
+bandas_modelo = ["B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A"]
+X_prediccion = df_datos[bandas_modelo]
+
+print(f"Calculando turbidez para {len(df_datos)} registros...")
+
+# 5. Realizar la predicción e integrar el resultado al DataFrame
+df_datos['Turbidez_Estimada'] = modelo.predict(X_prediccion)
+
+# 6. Exportar los resultados a un nuevo archivo CSV
+df_datos.to_csv(nombre_salida, index=False)
+print(f"¡Proceso terminado! Archivo guardado correctamente en: {os.path.abspath(nombre_salida)}")
+
+# 7. Mostrar una vista previa de las estimaciones en pantalla
+print("\nVista previa de las predicciones:")
+columnas_vista = ['Fecha', 'Punto', 'Turbidez_Estimada']
+print(df_datos[columnas_vista].head().to_string(index=False))
+
+```
+
+
+Gráfico de estimación de la turbidez 
+
+```{python}
+#| echo: false
+#| output: false
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+
+# 1. Ruta exacta de tu archivo CSV
+ruta_csv = r"D:\Monitoreo 2026\Output\Modelo XGBoost sin b1,11 y 12\Turbidez.csv"
+
+if not os.path.exists(ruta_csv):
+    raise FileNotFoundError(f"No se encontró el archivo en la ruta: {ruta_csv}")
+
+# 2. Cargar los datos
+df_datos = pd.read_csv(ruta_csv)
+
+# 3. FUNCIÓN DE LIMPIEZA AVANZADA: Reconstruir las fechas rotas
+def corregir_fecha_gee(cadena_fecha):
+    try:
+        partes = str(cadena_fecha).split('-')
+        if len(partes) != 3:
+            return pd.NaT
+        
+        anio = partes[0]
+        # Tomamos el número final que GEE exportó como el "Día del año acumulado"
+        dia_del_anio = int(partes[2]) 
+        
+        # Reconstruir la fecha real a partir del año y el día consecutivo del año
+        fecha_real = pd.to_datetime(f"{anio}-{dia_del_anio}", format="%Y-%j")
+        return fecha_real
+    except:
+        return pd.NaT
+
+# Aplicar la corrección de fechas inteligente
+df_datos['Fecha'] = df_datos['Fecha'].apply(corregir_fecha_gee)
+df_datos = df_datos.dropna(subset=['Fecha'])
+
+# Asegurar que el resto de columnas sean numéricas
+df_datos['Punto'] = pd.to_numeric(df_datos['Punto'], errors='coerce')
+df_datos = df_datos.dropna(subset=['Punto'])
+
+df_datos['Turbidez_Estimada'] = pd.to_numeric(df_datos['Turbidez_Estimada'], errors='coerce')
+df_datos = df_datos.dropna(subset=['Turbidez_Estimada'])
+
+# Ordenar cronológicamente de forma correcta
+df_datos = df_datos.sort_values('Fecha')
+
+# 4. Separar los datos por cada punto (1 y 2)
+df_punto1 = df_datos[df_datos['Punto'] == 1]
+df_punto2 = df_datos[df_datos['Punto'] == 2]
+
+# 5. Configurar el tamaño y estilo del gráfico
+plt.figure(figsize=(14, 7))
+sns.set_theme(style="whitegrid")
+
+# 6. Dibujar la curva del Punto 1 (Línea azul con marcadores redondos)
+plt.plot(df_punto1['Fecha'], df_punto1['Turbidez_Estimada'], 
+         marker='o', linestyle='-', color='#ff0000', linewidth=1.5, markersize=4, label='Punto 1 - Chaco')
+
+# 7. Dibujar la curva del Punto 2 (Línea naranja con marcadores cuadrados)
+plt.plot(df_punto2['Fecha'], df_punto2['Turbidez_Estimada'], 
+         marker='s', linestyle='-', color='#1100ff', linewidth=1.5, markersize=4, label='Punto 2 - Corrientes')
+
+# 8. Personalizar etiquetas, títulos y leyenda
+plt.title('Turbidez Estimada con modelo XGBoost sin Bandas 1, 11 y 12', fontsize=14, pad=15, fontweight='bold')
+plt.xlabel('Año', fontsize=12)
+plt.ylabel('Turbidez Estimada (NTU)', fontsize=12)
+plt.legend(title="Sitios de Monitoreo", fontsize=11)
+
+# 9. Formatear la visualización de las fechas en el eje X
+plt.gcf().autofmt_xdate()
+
+# 10. Guardar el gráfico como imagen en alta resolución
+ruta_guardado_grafico = r"D:\Monitoreo 2026\Output\Modelo XGBoost sin b1,11 y 12\Grafico_Turbidez_sinb1_11_12.png"
+plt.savefig(ruta_guardado_grafico, dpi=300, bbox_inches='tight')
+
+# Mostrar el gráfico en pantalla
+plt.show()
+
+```
+
+![Gráfico de estimación de la turbidez](Output\Modelo XGBoost sin b1,11 y 12\Grafico_Turbidez_sinb1_11_12.png){width="100%" fig-align="center"}
+
+# Análisis píxel a píxel
+
+## Defino zona de interés
+
+Para este el análisis pixel a pixel se define una región de interés de aproximadamente 2000 m x 2000 m, centrado en la coordenada -58.86940982429709, -27.482608080715305. Dicha región se escuentra alejada de las costas de las provincia de Chaco y Corrientes, con el objetivo de evitar zonas de arena y baja profundidad duante las temporadas de bajante del río Paraná, con esto tenemos más probabilidad de tener la mayor cantidad de píxeles de agua disponibles por cada fecha. 
+
+```{python}
+#| echo: false
+#| label: mapa-estudio-pixel-a-pixel
+#| eval: false
+
+import ee
+import geemap
+
+# Inicializar proyecto
+ee.Initialize(project='gistaq-2026')
+
+# CONFIGURACIÓN DEL ÁREA DE INTERÉS
+# Punto central en el Río Paraná
+punto_parana = ee.Geometry.Point([-58.86940982429709, -27.482608080715305])
+
+area_interes = punto_parana.buffer(1000).bounds()
+
+# Genero mapa interactivo centrado en la zona de estudio
+mapa = geemap.Map(center=[-27.482608080715305, -58.86940982429709], zoom=14)
+
+# Agrego una capa con la región de interés
+mapa.addLayer(area_interes, {'color': 'blue'}, 'Área de Interés')
+
+ruta_salida = r"D:\Monitoreo 2026\Output\Análisis pixel a pixel\mapa_area_de_interes.html"
+
+#mapa.to_html(ruta_salida)
+
+#mapa
+```
+
+**Región de interés**
+
+<iframe src="Output\Análisis pixel a pixel\mapa_area_de_interes.html" width="100%" height="500px" style="border: none;"></iframe>
+
+## Selección de bandas de interés de Sentinel-2 
+
+Se procede a la descarga de imágenes satelitales, el raster de cada fecha incluye las siguientes bandas **B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B11, B12** y la banda de clasificación de pixel **"SCL"**
+
+
+A continuación se detallan la información que puede contener SCL, para clasificar cada pixel.
+
+| Valor |  Descripción                                       |
+|-------|----------------------------------------------------|
+| 1     |  Saturada o defectuosa                             |
+| 2     |  Píxeles de área oscura                            |
+| 3     |  Sombras de nubes                                  |
+| 4     |  Vegetación                                        |
+| 5     |  Suelos desnudos                                   |
+| 6     |  Agua                                              |
+| 7     |  Baja probabilidad de nubes / nubes sin clasificar |
+| 8     |  Probabilidad media de nubes                       |
+| 9     |  Probabilidad alta de nubes                        |
+| 10    |  Cirro                                             |
+| 11    |  Nieve o hielo                                     |
+
+
+## Descarga de imágenes desde Google Earth Engine
+
+Se usó la banda SCL como criterio para la descarga de las imágenes, si por lo menos el 70% de los píxles de la zona de interés son de agua (es decir SCL=6) se procede a la descarga, de lo contrario se descarta la descarga de esa fecha.
+
+Se realiza la búsqueda para todo el año 2025.
+
+
+```{python}
+# | echo: false
+# | label: Análisis pixel a pixel -  descarga de imágenes Sentinel-2
+# | eval: false
+
+import ee
+import geemap
+from pathlib import Path
+
+# 1. Inicializar con tu proyecto de GEE
+ee.Initialize(project="gistaq-2026")
+
+# 2. Configuración del área de interés (Río Paraná)
+punto_parana = ee.Geometry.Point([-58.86940982429709, -27.482608080715305])
+area_interes = punto_parana.buffer(1000).bounds()
+
+# Mapeo y selección de bandas incluyendo SCL
+bandas_gee = [ "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B8A", "B9", "B11", "B12", "SCL",]
+bandas_modelo = ["B01","B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B11", "B12", "SCL",]
+
+# Definir y crear la carpeta de destino local usando pathlib
+ruta_carpeta = Path(r"D:\Monitoreo 2026\Output\Análisis pixel a pixel\imágenes sentinel-2")
+ruta_carpeta.mkdir(parents=True, exist_ok=True)
+
+
+# Función para evaluar la presencia de agua (SCL == 6) en el área de interés
+def filtrar_por_agua_local(img):
+    scl = img.select("SCL")
+    agua_mask = scl.eq(6)
+
+    # Calcular la proporción de píxeles de agua dentro del AOI
+    stats = agua_mask.reduceRegion(
+        reducer=ee.Reducer.mean(), geometry=area_interes, scale=10, maxPixels=1e9
+    )
+
+    porcentaje_agua = ee.Number(stats.get("SCL")).multiply(100)
+    return img.set("porcentaje_agua_local", porcentaje_agua)
+
+
+# 3. Filtrar la colección para todo el año 2025 (sin filtro global de nubes)
+coleccion = (
+    ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+    .filterDate("2025-01-01", "2025-01-31")
+    .filterBounds(area_interes)
+    .map(filtrar_por_agua_local)
+    .filter(ee.Filter.gte("porcentaje_agua_local", 70))
+    )  # Requiere al menos 5% de agua en tu AOI
+
+# 4. Convertimos la colección a una lista para iterar fecha por fecha
+lista_imagenes = coleccion.toList(coleccion.size().getInfo())
+total_imagenes = lista_imagenes.size().getInfo()
+
+print(
+    f"Se encontraron {total_imagenes} imágenes válidas para la zona del Río Paraná en 2025."
+)
+
+# 5. Bucle de descarga directa a la computadora
+if total_imagenes > 0:
+    for i in range(total_imagenes):
+        img = ee.Image(lista_imagenes.get(i))
+
+        # Extraemos la fecha de la captura
+        fecha = img.date().format("YYYY-MM-dd").getInfo() # Importante (se debe usar dd en minúculas)
+
+        # Seleccionamos las bandas, escalamos las espectrales (/10000) y mantenemos SCL intacta
+        bandas_espectrales = img.select(
+            ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B8A", "B9", "B11", "B12"]
+        ).divide(10000.0)
+        banda_scl = img.select(["SCL"])
+
+        img_escalada = bandas_espectrales.addBands(banda_scl)
+
+        # Renombramos las bandas internas para fijar los metadatos de las capas
+        img_multibanda = img_escalada.select(bandas_gee, bandas_modelo)
+
+        # Definimos la ruta completa del archivo de salida en tu disco D
+        ruta_archivo_salida = (
+            ruta_carpeta / f"Sentinel2_{fecha}_Parana_Completo.tif"
+        )
+
+        print(f"\nDescargando mapa completo para la fecha: {fecha}...")
+
+        # geemap descarga el archivo y muestra una barra de progreso en la consola
+        geemap.download_ee_image(
+            image=img_multibanda,
+            filename=str(ruta_archivo_salida),
+            scale=10,  # Resolución de 10 metros
+            region=area_interes,  # Recorte de 2x2 km
+            crs="EPSG:4326",  # Sistema de coordenadas geográficas estándar
+        )
+
+    print(
+        f"\n¡Éxito! Todas las imágenes de 2025 han sido guardadas en:\n--> {ruta_carpeta}"
+    )
+else:
+    print(
+        "No se encontraron imágenes satelitales que coincidan con los filtros en 2025."
+    )
+```
+
+
+En total se descargaron 45 imágenes que cumplieron con esta condición, se realizó la revisión de cada de ella. 
+
+Finalmente quedaron 17 imágenes que fueron seleccionadas para su procesamiento. El resto fué descartada, ya sea porque contenian muchas nubes o tenían mucho ruido.
+
+## Estimación de la turbidez para cada fecha
+
+A las imágenes seleccionadas se le aplicó un modelo de estimación de turbidez, filtrando los pixeles que no sean agua con la ayuda de la banda SCL. 
+
+```{python}
+# | echo: false
+# | label: Análisis pixel a pixel - aplico modelo
+# | eval: false
+import os
+import glob
+import numpy as np
+import pandas as pd
+import rasterio
+import xgboost as xgb
+
+# 1. Configuración de Rutas
+ruta_modelo = r"D:\Monitoreo 2026\Output\Modelo XGBoost sin b1,11 y 12\modelo_xgboost_optuna.json"
+# Carpeta donde guardaste los recortes TIF de Sentinel-2 (deben contener las bandas apiladas)
+carpeta_entrada = r"D:\Monitoreo 2026\Output\Análisis pixel a pixel\imágenes sentinel-2" 
+carpeta_salida = r"D:\Monitoreo 2026\Output\Análisis pixel a pixel\Mapas de turbidez"
+
+os.makedirs(carpeta_salida, exist_ok=True)
+
+# 2. Cargar el modelo XGBoost
+print("Cargando modelo XGBoost...")
+modelo = xgb.XGBRegressor()
+modelo.load_model(ruta_modelo)
+
+# El orden estricto de las bandas de reflectancia para el modelo
+bandas_modelo = ["B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A"]
+
+# 3. Buscar todas las imágenes Sentinel-2 en la carpeta
+imagenes = glob.glob(os.path.join(carpeta_entrada, "*.tif"))
+
+if not imagenes:
+    print(f"No se encontraron imágenes .tif en {carpeta_entrada}")
+else:
+    for ruta_img in imagenes:
+        nombre_archivo = os.path.basename(ruta_img)
+        print(f"\nProcesando: {nombre_archivo}")
+        
+        # 4. Leer el Raster con Rasterio
+        with rasterio.open(ruta_img) as src:
+            meta = src.meta.copy()
+            
+            # Leemos las primeras 8 bandas para el modelo XGBoost
+            bandas_data = []
+            for i in range(1, 9): 
+                bandas_data.append(src.read(i))
+            stack_bandas = np.array(bandas_data) # (8, filas, columnas)
+            
+            # LEER LA BANDA SCL (Asumimos que es la banda 9 en tu archivo TIFF)
+            banda_scl = src.read(13) # (filas, columnas)
+            
+        filas, columnas = banda_scl.shape
+        
+        # 5. Reestructurar las bandas de reflectancia para Pandas (filas * columnas, 8)
+        matriz_pixeles = stack_bandas.reshape(8, -1).T
+        df_pixeles = pd.DataFrame(matriz_pixeles, columns=bandas_modelo)
+        
+        # Aplanar la banda SCL para que coincida fila por fila con los píxeles
+        scl_plano = banda_scl.flatten()
+        
+        # 6. FILTRO CRUCIAL: El píxel es válido SÓLO si SCL es estrictamente igual a 6 (Agua)
+        mascara_agua_pura = (scl_plano == 6) & (df_pixeles.notna().all(axis=1))
+        
+        # Inicializar la matriz final de predicciones llena de NaN (No Data / Vacío)
+        predicciones_planas = np.full(len(df_pixeles), np.nan, dtype=np.float32)
+        
+        # 7. Predecir ÚNICAMENTE donde hay agua según la SCL
+        if mascara_agua_pura.any():
+            X_validos = df_pixeles[mascara_agua_pura]
+            predicciones_planas[mascara_agua_pura] = modelo.predict(X_validos)
+            print(f"-> Píxeles totales procesados por XGBoost: {mascara_agua_pura.sum()}")
+        else:
+            print("-> Advertencia: No se detectaron píxeles de agua (SCL=6) en esta escena.")
+        
+        # 8. Reconstruir la forma del mapa bidimensional (filas, columnas)
+        mapa_turbidez = predicciones_planas.reshape(filas, columnas)
+        
+        # 9. Configurar los metadatos del TIFF de salida
+        meta.update({
+            'driver': 'GTiff',
+            'dtype': 'float32',
+            'count': 1,        # Guardamos solo 1 banda final (Turbidez)
+            'nodata': -9999.0  # Definimos un valor estándar de No Data para que el SIG lo reconozca como vacío
+        })
+        
+        # Reemplazar los valores NaN matemáticos por el código oficial de No Data antes de guardar
+        mapa_turbidez = np.where(np.isnan(mapa_turbidez), -9999.0, mapa_turbidez)
+        
+        # 10. Guardar el nuevo mapa de turbidez limpio
+        ruta_salida_tif = os.path.join(carpeta_salida, f"Turbidez_Limpia_{nombre_archivo}")
+        with rasterio.open(ruta_salida_tif, "w", **meta) as dst:
+            dst.write(mapa_turbidez, 1)
+            
+        print(f"¡Mapa guardado sin tierra ni nubes! -> Turbidez_Limpia_{nombre_archivo}")
+
+print("\n¡Procesamiento masivo finalizado con éxito!")
+
+```
+
+## Mapas sobre la región de interés
+
+**Mapa de pendiente**
+
+```{python}
+# | echo: false
+# | label: Análisis pixel a pixel - calculo pendiente
+# | eval: false
+
+import os
+import glob
+import numpy as np
+import rasterio
+
+# 1. Configuración de carpetas
+carpeta_turbidez = r"D:\Monitoreo 2026\Output\Análisis pixel a pixel\Mejores mapas turb"
+ruta_salida_pendiente = r"D:\Monitoreo 2026\Output\Análisis pixel a pixel\Mapa de pendientes\Pendiente_Turbidez_2025.tif"
+
+os.makedirs(os.path.dirname(ruta_salida_pendiente), exist_ok=True)
+
+# 2. Buscar mapas de turbidez limpia (glob mantiene el orden alfabético/cronológico de tu carpeta)
+archivos_tif = sorted(glob.glob(os.path.join(carpeta_turbidez, "Turbidez_Limpia_*.tif")))
+
+if not archivos_tif:
+    raise FileNotFoundError(f"No se encontraron mapas de turbidez en {carpeta_turbidez}")
+
+n_imagenes = len(archivos_tif)
+print(f"Se encontraron y leyeron directamente {n_imagenes} imágenes ordenadas.")
+
+# Creamos el eje de tiempo simple: [0, 1, 2, 3, ..., N] basado en la posición de la imagen
+eje_x = np.arange(n_imagenes, dtype=np.float32)
+
+# 3. Cargar todas las imágenes directamente a la pila tridimensional (Stack)
+lista_matrices = []
+meta_referencia = None
+
+for ruta in archivos_tif:
+    with rasterio.open(ruta) as src:
+        if meta_referencia is None:
+            meta_referencia = src.meta.copy()
+        
+        matriz = src.read(1).astype(np.float32)
+        matriz[matriz == -9999.0] = np.nan  # Mantener los vacíos del SCL
+        lista_matrices.append(matriz)
+
+stack_turbidez = np.stack(lista_matrices, axis=0)
+_, filas, columnas = stack_turbidez.shape
+
+# 4. Calcular la pendiente píxel a píxel
+print("Calculando la tendencia por píxel...")
+
+stack_plano = stack_turbidez.reshape(n_imagenes, -1)  
+n_pixeles = stack_plano.shape[1]
+
+pendientes_planas = np.full(n_pixeles, np.nan, dtype=np.float32)
+
+for i in range(n_pixeles):
+    y = stack_plano[:, i]
+    datos_validos = ~np.isnan(y)
+    
+    # Calculamos la pendiente si el píxel tiene al menos 3 fechas sin nubes/tierra
+    if datos_validos.sum() >= 3:
+        # np.polyfit calcula la línea recta directa
+        pendiente, _ = np.polyfit(eje_x[datos_validos], y[datos_validos], 1)
+        pendientes_planas[i] = pendiente
+
+# 5. Reconstruir el mapa bidimensional
+mapa_pendiente = pendientes_planas.reshape(filas, columnas)
+
+# 6. Configurar metadatos del archivo de salida
+meta_referencia.update({
+    'driver': 'GTiff',
+    'dtype': 'float32',
+    'count': 1,
+    'nodata': -9999.0
+})
+
+mapa_pendiente = np.where(np.isnan(mapa_pendiente), -9999.0, mapa_pendiente)
+
+# 7. Guardar el mapa de pendientes final
+with rasterio.open(ruta_salida_pendiente, "w", **meta_referencia) as dst:
+    dst.write(mapa_pendiente, 1)
+
+print(f"¡Proceso completado con éxito! Mapa guardado en:\n{ruta_salida_pendiente}")
+```
+
+![Mapa pendiente](Output\Análisis pixel a pixel\Mapas png\PENDIENTE.png){ width=80% fig-align="center"}
+
+Para el año 2025, se observa que la turbidez aumentó en promedio 2 NTU hacia el lado de la costa correntina y disminuyó 38 NTU en las proximidades la costa chaqueña. 
+
+**Mapa de máximos**
+```{python}
+# | echo: false
+# | label: Análisis pixel a pixel - calculo máximos
+# | eval: false
+
+import os
+import glob
+import numpy as np
+import rasterio
+
+# 1. Configuración de carpetas
+carpeta_turbidez = r"D:\Monitoreo 2026\Output\Análisis pixel a pixel\Mejores mapas turb"
+# CAMBIADO: Nueva ruta de salida específica para el mapa de máximos
+ruta_salida_maximos = r"D:\Monitoreo 2026\Output\Análisis pixel a pixel\Mapa de pendientes\Maximo_Turbidez_2025.tif"
+
+os.makedirs(os.path.dirname(ruta_salida_maximos), exist_ok=True)
+
+# 2. Buscar mapas de turbidez limpia
+archivos_tif = sorted(glob.glob(os.path.join(carpeta_turbidez, "Turbidez_Limpia_*.tif")))
+
+if not archivos_tif:
+    raise FileNotFoundError(f"No se encontraron mapas de turbidez in {carpeta_turbidez}")
+
+n_imagenes = len(archivos_tif)
+print(f"Se encontraron y leyeron directamente {n_imagenes} imágenes.")
+
+# 3. Cargar todas las imágenes directamente a la pila tridimensional (Stack)
+lista_matrices = []
+meta_referencia = None
+
+for ruta in archivos_tif:
+    with rasterio.open(ruta) as src:
+        if meta_referencia is None:
+            meta_referencia = src.meta.copy()
+        
+        matriz = src.read(1).astype(np.float32)
+        matriz[matriz == -9999.0] = np.nan  # Mantener los vacíos del SCL
+        lista_matrices.append(matriz)
+
+stack_turbidez = np.stack(lista_matrices, axis=0)
+
+# 4. CAMBIADO: Calcular el valor MÁXIMO píxel a píxel de forma instantánea
+print("Calculando el valor máximo de turbidez por píxel...")
+# Con axis=0 le decimos a numpy que busque el valor más alto a lo largo de las fechas
+mapa_maximo = np.nanmax(stack_turbidez, axis=0)
+
+# 5. Configurar metadatos del archivo de salida
+meta_referencia.update({
+    'driver': 'GTiff',
+    'dtype': 'float32',
+    'count': 1,
+    'nodata': -9999.0
+})
+
+# Reemplazar los NaN por el NoData oficial antes de guardar (por si algún píxel fue 100% nube todo el año)
+mapa_maximo = np.where(np.isnan(mapa_maximo), -9999.0, mapa_maximo)
+
+# 6. Guardar el mapa de máximos final
+with rasterio.open(ruta_salida_maximos, "w", **meta_referencia) as dst:
+    dst.write(mapa_maximo, 1)
+
+print(f"¡Proceso completado con éxito! Mapa de máximos guardado en:\n{ruta_salida_maximos}")
+
+```
+
+![Mapa máximos](Output\Análisis pixel a pixel\Mapas png\MAXIMOS.png){ width=80% fig-align="center"}
+
+**Mapa de mínimos**
+```{python}
+# | echo: false
+# | label: Análisis pixel a pixel - calculo mínimos
+# | eval: false
+
+import os
+import glob
+import numpy as np
+import rasterio
+
+# 1. Configuración de carpetas
+carpeta_turbidez = r"D:\Monitoreo 2026\Output\Análisis pixel a pixel\Mejores mapas turb"
+# CAMBIADO: Nueva ruta de salida específica para el mapa de mínimos
+ruta_salida_minimos = r"D:\Monitoreo 2026\Output\Análisis pixel a pixel\Mapa de pendientes\Minimo_Turbidez_2025.tif"
+
+os.makedirs(os.path.dirname(ruta_salida_minimos), exist_ok=True)
+
+# 2. Buscar mapas de turbidez limpia
+archivos_tif = sorted(glob.glob(os.path.join(carpeta_turbidez, "Turbidez_Limpia_*.tif")))
+
+if not archivos_tif:
+    raise FileNotFoundError(f"No se encontraron mapas de turbidez en {carpeta_turbidez}")
+
+n_imagenes = len(archivos_tif)
+print(f"Se encontraron y leyeron directamente {n_imagenes} imágenes.")
+
+# 3. Cargar todas las imágenes directamente a la pila tridimensional (Stack)
+lista_matrices = []
+meta_referencia = None
+
+for ruta in archivos_tif:
+    with rasterio.open(ruta) as src:
+        if meta_referencia is None:
+            meta_referencia = src.meta.copy()
+        
+        matriz = src.read(1).astype(np.float32)
+        matriz[matriz == -9999.0] = np.nan  # Mantener los vacíos del SCL
+        lista_matrices.append(matriz)
+
+stack_turbidez = np.stack(lista_matrices, axis=0)
+
+# 4. CAMBIADO: Calcular el valor MÍNIMO píxel a píxel de forma instantánea
+print("Calculando el valor mínimo de turbidez por píxel...")
+# Con axis=0 le decimos a numpy que busque el valor más bajo a lo largo de las fechas
+mapa_minimo = np.nanmin(stack_turbidez, axis=0)
+
+# 5. Configurar metadatos del archivo de salida
+meta_referencia.update({
+    'driver': 'GTiff',
+    'dtype': 'float32',
+    'count': 1,
+    'nodata': -9999.0
+})
+
+# Reemplazar los NaN por el NoData oficial antes de guardar (por si algún píxel fue nulo todo el año)
+mapa_minimo = np.where(np.isnan(mapa_minimo), -9999.0, mapa_minimo)
+
+# 6. Guardar el mapa de mínimos final
+with rasterio.open(ruta_salida_minimos, "w", **meta_referencia) as dst:
+    dst.write(mapa_minimo, 1)
+
+print(f"¡Proceso completado con éxito! Mapa de mínimos guardado en:\n{ruta_salida_minimos}")
+
+```
+
+![Mapa mínimos](Output\Análisis pixel a pixel\Mapas png\MINIMOS.png){ width=80% fig-align="center"}
+
+**Índice MENSI**
+
+```{python}
+# | echo: false
+# | label: Análisis pixel a pixel - Calculo MENSI
+# | eval: false
+
+import os
+import glob
+import numpy as np
+import rasterio
+
+# 1. Configuración de carpetas
+carpeta_turbidez = r"D:\Monitoreo 2026\Output\Análisis pixel a pixel\Mejores mapas turb"
+ruta_salida_mensi = r"D:\Monitoreo 2026\Output\Análisis pixel a pixel\Mapa de pendientes\MENSI_Turbidez_2025.tif"
+
+os.makedirs(os.path.dirname(ruta_salida_mensi), exist_ok=True)
+
+# 2. Busca mapas de turbidez
+archivos_tif = sorted(glob.glob(os.path.join(carpeta_turbidez, "Turbidez_Limpia_*.tif")))
+
+if not archivos_tif:
+    raise FileNotFoundError(f"No se encontraron mapas de turbidez en {carpeta_turbidez}")
+
+n_imagenes = len(archivos_tif) # Esto equivale a M (Total de fechas)
+print(f"Calculando MENSI usando {n_imagenes} fechas disponibles (M).")
+
+# 3. Cargo las imágenes y calculo el promedio espacial por cada fecha
+lista_matrices_normalizadas = []
+meta_referencia = None
+
+for ruta in archivos_tif:
+    with rasterio.open(ruta) as src:
+        if meta_referencia is None:
+            meta_referencia = src.meta.copy()
+        
+        matriz = src.read(1).astype(np.float32)
+        matriz[matriz == -9999.0] = np.nan # Ignorar NoData
+        
+        # Calcula el promedio de turbidez de TODO EL RÍO para esta  fecha específica
+        # Esto equivale a la sumatoria de n_i / N en la fórmula
+        promedio_fecha = np.nanmean(matriz)
+        
+        # NORMALIZACIÓN ESPACIAL: Dividir cada píxel por el promedio de su propio día
+        if promedio_fecha > 0:
+            matriz_normalizada = matriz / promedio_fecha
+            lista_matrices_normalizadas.append(matriz_normalizada)
+
+# Creaa la pila tridimensional con los mapas ya normalizados
+stack_normalizado = np.stack(lista_matrices_normalizadas, axis=0)
+_, filas, columnas = stack_normalizado.shape
+
+# 4. PROMEDIO TEMPORAL: Sumar a lo largo del tiempo (axis=0) y dividir por M
+print("Promediando las normalizaciones en el tiempo...")
+mapa_mensi = np.nanmean(stack_normalizado, axis=0)
+
+# 5. Configurar metadatos del archivo de salida
+meta_referencia.update({
+    'driver': 'GTiff',
+    'dtype': 'float32',
+    'count': 1,
+    'nodata': -9999.0
+})
+
+# Reemplazar los NaN por el NoData oficial antes de guardar
+mapa_mensi = np.where(np.isnan(mapa_mensi), -9999.0, mapa_mensi)
+
+# 6. Guardo el mapa MENSI final
+with rasterio.open(ruta_salida_mensi, "w", **meta_referencia) as dst:
+    dst.write(mapa_mensi, 1)
+
+print(f"Mapa del índice MENSI generado con éxito, Guardado en:\n{ruta_salida_mensi}")
+
+```
+
+![Mapa MENSI](Output\Análisis pixel a pixel\Mapas png\MENSI.png){ width=80% fig-align="center"}
+
+El cálculo del índice MENSI para el análisis píxel a píxel se estructuró en dos etapas secuenciales:
+
+- 1 - Normalización Espacial (por fecha individual): Para cada fecha individual, se calculó el valor promedio de turbidez de todo el cuerpo de agua . Posteriormente, cada píxel de esa misma fecha se dividió por dicho promedio.
+
+- 2 - Integración Temporal: Finalmente, para cada píxel individual, se sumaron sus valores relativos de todas las fechas y el resultado se dividió por el número total de imágenes analizadas.
+
+Si el valor del pixel es mayor que el promedio, el valor del índice MENSI será mayor que 1.
+
+Si el valor del píxel es menor que el promedio, MENSI será menor que 1. 
+
+Si el índice es un buen indicador de las condiciones de calidad del agua. Las áreas con valores de índice menores que 1 tienen mejores condiciones de calidad.
+
