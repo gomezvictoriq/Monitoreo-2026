@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Víctor Gustavo Gómez">
+<meta name="keywords" content="GISTAQ, UTN, FRRe, Algoritmo, Paraná, Machine learning, Teledetección">
+
+<title>Monitoreo 2026</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./img/logo-gistaq.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-d385e82cc8fc98bd69993604ac8118d4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-1977b6584acc90a4237ecb3ca471f918.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-d385e82cc8fc98bd69993604ac8118d4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./img\logo-gistaq.png" alt="" class="navbar-logo light-content">
+    <img src="./img\logo-gistaq.png" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Monitoreo 2026</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Navegación de palanca" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
+<span class="menu-text">Página de inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./pestaña1.html"> 
+<span class="menu-text">Relevamiento de datos</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./pestaña2.html"> 
+<span class="menu-text">Google Earth Engine</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./pestaña3.html"> 
+<span class="menu-text">Correción atmosférica</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#estimacion-de-turbidez-con-modelo-xgboost-del-2025" id="toc-estimacion-de-turbidez-con-modelo-xgboost-del-2025" class="nav-link active" data-scroll-target="#estimacion-de-turbidez-con-modelo-xgboost-del-2025"><span class="header-section-number">1</span> Estimacion de Turbidez con modelo XGBOOST del 2025</a></li>
+  <li><a href="#modelado-algoritmo-xg-boost-para-estimación-de-la-turbidez" id="toc-modelado-algoritmo-xg-boost-para-estimación-de-la-turbidez" class="nav-link" data-scroll-target="#modelado-algoritmo-xg-boost-para-estimación-de-la-turbidez"><span class="header-section-number">2</span> Modelado algoritmo XG Boost para estimación de la turbidez</a></li>
+  <li><a href="#entrenamiento-del-modelo-con-todas-las-bandas" id="toc-entrenamiento-del-modelo-con-todas-las-bandas" class="nav-link" data-scroll-target="#entrenamiento-del-modelo-con-todas-las-bandas"><span class="header-section-number">3</span> Entrenamiento del modelo con todas las bandas</a></li>
+  <li><a href="#entrenamiento-del-modelo-excluyendo-bandas-1-11-y-12" id="toc-entrenamiento-del-modelo-excluyendo-bandas-1-11-y-12" class="nav-link" data-scroll-target="#entrenamiento-del-modelo-excluyendo-bandas-1-11-y-12"><span class="header-section-number">4</span> Entrenamiento del modelo excluyendo bandas 1, 11 y 12</a>
+  <ul class="collapse">
+  <li><a href="#estimación-sobre-el-río-paraná-a-partir-del-modelo-sin-bandas-111-y-12-de-sentinel-2" id="toc-estimación-sobre-el-río-paraná-a-partir-del-modelo-sin-bandas-111-y-12-de-sentinel-2" class="nav-link" data-scroll-target="#estimación-sobre-el-río-paraná-a-partir-del-modelo-sin-bandas-111-y-12-de-sentinel-2"><span class="header-section-number">4.1</span> Estimación sobre el río Paraná a partir del modelo sin Bandas 1,11 y 12 de Sentinel-2</a></li>
+  </ul></li>
+  <li><a href="#análisis-píxel-a-píxel" id="toc-análisis-píxel-a-píxel" class="nav-link" data-scroll-target="#análisis-píxel-a-píxel"><span class="header-section-number">5</span> Análisis píxel a píxel</a>
+  <ul class="collapse">
+  <li><a href="#defino-zona-de-interés" id="toc-defino-zona-de-interés" class="nav-link" data-scroll-target="#defino-zona-de-interés"><span class="header-section-number">5.1</span> Defino zona de interés</a></li>
+  <li><a href="#selección-de-bandas-de-interés-de-sentinel-2" id="toc-selección-de-bandas-de-interés-de-sentinel-2" class="nav-link" data-scroll-target="#selección-de-bandas-de-interés-de-sentinel-2"><span class="header-section-number">5.2</span> Selección de bandas de interés de Sentinel-2</a></li>
+  <li><a href="#descarga-de-imágenes-desde-google-earth-engine" id="toc-descarga-de-imágenes-desde-google-earth-engine" class="nav-link" data-scroll-target="#descarga-de-imágenes-desde-google-earth-engine"><span class="header-section-number">5.3</span> Descarga de imágenes desde Google Earth Engine</a></li>
+  <li><a href="#estimación-de-la-turbidez-para-cada-fecha" id="toc-estimación-de-la-turbidez-para-cada-fecha" class="nav-link" data-scroll-target="#estimación-de-la-turbidez-para-cada-fecha"><span class="header-section-number">5.4</span> Estimación de la turbidez para cada fecha</a></li>
+  <li><a href="#mapas-sobre-la-región-de-interés" id="toc-mapas-sobre-la-región-de-interés" class="nav-link" data-scroll-target="#mapas-sobre-la-región-de-interés"><span class="header-section-number">5.5</span> Mapas sobre la región de interés</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content column-page-right" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Monitoreo 2026</h1>
+</div>
+
+
+<div class="quarto-title-meta-author column-page-right">
+  <div class="quarto-title-meta-heading">Autor/a</div>
+  <div class="quarto-title-meta-heading">Afiliación</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Víctor Gustavo Gómez <a href="mailto:gomezvictoriq@ca.frre.utn.edu.ar" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            <a href="https://www.instagram.com/gistaq.utn/">
+            GISTAQ (UTN-FRRe)
+            </a>
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta column-page-right">
+
+      
+    <div>
+    <div class="quarto-title-meta-heading">Fecha de publicación</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">13 de noviembre de 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+<div>
+  <div class="abstract">
+    <div class="block-title">Resumen</div>
+    <p>Este sitio web contiene información …</p>
+  </div>
+</div>
+
+<div>
+  <div class="keywords">
+    <div class="block-title">Palabras clave</div>
+    <p>GISTAQ, UTN, FRRe, Algoritmo, Paraná, Machine learning, Teledetección</p>
+  </div>
+</div>
+
+</header>
+
+
+<section id="estimacion-de-turbidez-con-modelo-xgboost-del-2025" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Estimacion de Turbidez con modelo XGBOOST del 2025</h1>
+<p>Defino 2 puntos de interés, sobre el río paraná</p>
+<ul>
+<li>Punto 1 (Chaco)</li>
+<li>Punto 2 (Corrientes)</li>
+</ul>
+<div id="1a25a182" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ee</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Inicializar con tu proyecto</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>ee.Initialize(project<span class="op">=</span><span class="st">'gistaq-2026'</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Definir los puntos de interés</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>punto_1 <span class="op">=</span> ee.Geometry.Point([<span class="op">-</span><span class="fl">58.86813681183558</span>, <span class="op">-</span><span class="fl">27.46512351698905</span>])</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>punto_2 <span class="op">=</span> ee.Geometry.Point([<span class="op">-</span><span class="fl">58.8582877403329</span>, <span class="op">-</span><span class="fl">27.473538528861454</span>])</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># punto_1 (Chaco) , punto_2 (Corrientes)</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Ubicación de los puntos</p>
+<iframe src="Output\mapas\mapa_puntos_turbidez.html" width="100%" height="500px" style="border: none;">
+</iframe>
+<p>Importo imágenes de Sentinel-2</p>
+<div id="e55c3ad5" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Agrupo los puntos</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>puntos_busqueda <span class="op">=</span> ee.FeatureCollection([</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    ee.Feature(punto_1, {<span class="st">'id_simple'</span>: <span class="dv">1</span>}),</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    ee.Feature(punto_2, {<span class="st">'id_simple'</span>: <span class="dv">2</span>})</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Mapeo de bandas de GEE hacia las columnas del modelo</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>bandas_gee <span class="op">=</span> [<span class="st">"B1"</span>, <span class="st">"B2"</span>, <span class="st">"B3"</span>, <span class="st">"B4"</span>, <span class="st">"B5"</span>, <span class="st">"B6"</span>, <span class="st">"B7"</span>, <span class="st">"B8"</span>, <span class="st">"B11"</span>, <span class="st">"B12"</span>, <span class="st">"B8A"</span>]</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>bandas_modelo <span class="op">=</span> [<span class="st">"B01"</span>, <span class="st">"B02"</span>, <span class="st">"B03"</span>, <span class="st">"B04"</span>, <span class="st">"B05"</span>, <span class="st">"B06"</span>, <span class="st">"B07"</span>, <span class="st">"B08"</span>, <span class="st">"B11"</span>, <span class="st">"B12"</span>, <span class="st">"B8A"</span>]</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Filtro la colección por fecha y lugar</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>coleccion <span class="op">=</span> (ee.ImageCollection(<span class="st">"COPERNICUS/S2_SR_HARMONIZED"</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>             .filterDate(<span class="st">'2023-01-01'</span>, <span class="st">'2025-12-31'</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>             .filterBounds(puntos_busqueda))</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Función interna para extraer los datos de cada imagen de la serie</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extraer_datos_por_imagen(img):</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    fecha <span class="op">=</span> img.date().<span class="bu">format</span>(<span class="st">'YYYY-MM-DD'</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> img.select(bandas_gee <span class="op">+</span> [<span class="st">"SCL"</span>]).reduceRegions(</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        collection<span class="op">=</span>puntos_busqueda,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        reducer<span class="op">=</span>ee.Reducer.first(),</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        scale<span class="op">=</span><span class="dv">10</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    ).<span class="bu">map</span>(<span class="kw">lambda</span> f: f.<span class="bu">set</span>(<span class="st">'fecha_captura'</span>, fecha))</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Aplicar la función a toda la colección y aplanar los resultados</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>valores_historicos <span class="op">=</span> coleccion.<span class="bu">map</span>(extraer_datos_por_imagen).flatten()</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Descargando serie temporal desde Earth Engine..."</span>)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>datos_extraidos <span class="op">=</span> valores_historicos.getInfo()[<span class="st">'features'</span>]</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Lista para almacenar las filas válidas</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>filas_validas <span class="op">=</span> []</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> feature <span class="kw">in</span> datos_extraidos:</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    propiedades <span class="op">=</span> feature[<span class="st">'properties'</span>]</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    clase_scl <span class="op">=</span> propiedades.get(<span class="st">'SCL'</span>)</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Evaluar el SCL (Valor 6 = Agua)</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> clase_scl <span class="op">==</span> <span class="dv">6</span>:</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>        registro_pixel <span class="op">=</span> {</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Fecha'</span>: propiedades.get(<span class="st">'fecha_captura'</span>),</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Punto'</span>: propiedades.get(<span class="st">'id_simple'</span>) <span class="co"># Aquí se guarda solo 1 o 2</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Mapear nombres de bandas y dividir por 10,000</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> b_gee, b_mod <span class="kw">in</span> <span class="bu">zip</span>(bandas_gee, bandas_modelo):</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>            valor_original <span class="op">=</span> propiedades.get(b_gee)</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> valor_original <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>                registro_pixel[b_mod] <span class="op">=</span> valor_original <span class="op">/</span> <span class="fl">10000.0</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>                registro_pixel[b_mod] <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>        filas_validas.append(registro_pixel)</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Crear el DataFrame y exportarlo a CSV</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> filas_validas:</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Definimos el orden de las columnas con los metadatos al inicio</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    columnas_csv <span class="op">=</span> [<span class="st">'Fecha'</span>, <span class="st">'Punto'</span>] <span class="op">+</span> bandas_modelo</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.DataFrame(filas_validas, columns<span class="op">=</span>columnas_csv)</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>    nombre_archivo <span class="op">=</span> <span class="st">"serie_temporal_turbidez_final.csv"</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>    df.to_csv(nombre_archivo, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">¡Éxito! Archivo '</span><span class="sc">{</span>nombre_archivo<span class="sc">}</span><span class="ss">' generado correctamente."</span>)</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Nueva vista previa del contenido del CSV:"</span>)</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(df.head().to_string(index<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"No se encontraron registros de agua limpia en ese periodo."</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Estimacion de la turbidez</p>
+<div id="d00fe8c6" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> xgboost <span class="im">as</span> xgb</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Rutas de tus archivos</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>ruta_modelo <span class="op">=</span> <span class="vs">r"D:</span><span class="dv">\M</span><span class="vs">onitoreo 2026</span><span class="er">\</span><span class="vs">Output</span><span class="dv">\M</span><span class="vs">odelo de Turbidez 2025</span><span class="dv">\m</span><span class="vs">odelo_xgboost_optuna</span><span class="dv">.</span><span class="vs">json"</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>nombre_entrada <span class="op">=</span> <span class="st">"serie_temporal_turbidez_final.csv"</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>nombre_salida <span class="op">=</span> <span class="st">"resultados_turbidez_final.csv"</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Cargar el CSV con las reflectancias de Sentinel-2</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(nombre_entrada):</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(<span class="ss">f"No se encontró el archivo </span><span class="sc">{</span>nombre_entrada<span class="sc">}</span><span class="ss">. Asegúrate de ejecutar primero el script de Earth Engine."</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>df_datos <span class="op">=</span> pd.read_csv(nombre_entrada)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Inicializar y cargar tu modelo XGBoost entrenado con Optuna</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Cargando modelo XGBoost..."</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>modelo <span class="op">=</span> xgb.XGBRegressor()</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>modelo.load_model(ruta_modelo)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Seleccionar estrictamente las columnas con las que se entrenó el modelo</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>bandas_modelo <span class="op">=</span> [<span class="st">"B01"</span>, <span class="st">"B02"</span>, <span class="st">"B03"</span>, <span class="st">"B04"</span>, <span class="st">"B05"</span>, <span class="st">"B06"</span>, <span class="st">"B07"</span>, <span class="st">"B08"</span>, <span class="st">"B11"</span>, <span class="st">"B12"</span>, <span class="st">"B8A"</span>]</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>X_prediccion <span class="op">=</span> df_datos[bandas_modelo]</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Calculando turbidez para </span><span class="sc">{</span><span class="bu">len</span>(df_datos)<span class="sc">}</span><span class="ss"> registros..."</span>)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Realizar la predicción e integrar el resultado al DataFrame</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>df_datos[<span class="st">'Turbidez_Estimada'</span>] <span class="op">=</span> modelo.predict(X_prediccion)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Exportar los resultados a un nuevo archivo CSV</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>df_datos.to_csv(nombre_salida, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"¡Proceso terminado! Archivo guardado correctamente en: </span><span class="sc">{</span>os<span class="sc">.</span>path<span class="sc">.</span>abspath(nombre_salida)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="co"># 7. Mostrar una vista previa de las estimaciones en pantalla</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Vista previa de las predicciones:"</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>columnas_vista <span class="op">=</span> [<span class="st">'Fecha'</span>, <span class="st">'Punto'</span>, <span class="st">'Turbidez_Estimada'</span>]</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df_datos[columnas_vista].head().to_string(index<span class="op">=</span><span class="va">False</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Gráfico de estimación de la turbidez</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Output\gráficos\comparativa_turbidez_XGBoost2025.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Gráfico de estimación de la turbidez</figcaption>
+</figure>
+</div>
+</section>
+<section id="modelado-algoritmo-xg-boost-para-estimación-de-la-turbidez" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Modelado algoritmo XG Boost para estimación de la turbidez</h1>
+<p>Se entrenará un modelo de machine learning con valores de reflectancia de superficies de Sentinel-2 y datos de turbidez provenientes de la planta potabilizadora “La Toma” de SAMEEP, sobre el riacho Barranqueras.</p>
+<p>Trabajamos con la librería pandas para unir los datos de turbidez y de reflectancia en un único arcivo</p>
+<div id="a474a6a4" class="cell" data-execution_count="6">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Defino los DataFrame</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>df1 <span class="op">=</span> pd.read_csv(<span class="vs">r"Input/tsv/sameep_historicos</span><span class="dv">.</span><span class="vs">tsv"</span>, sep<span class="op">=</span><span class="st">'</span><span class="ch">\t</span><span class="st">'</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>df2 <span class="op">=</span> pd.read_csv(<span class="vs">r"Input/tsv/base_de_datos_gis</span><span class="dv">.</span><span class="vs">tsv"</span>, sep<span class="op">=</span><span class="st">'</span><span class="ch">\t</span><span class="st">'</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Combino df1 y df2</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>df_combinado <span class="op">=</span> pd.merge(df1, df2, on<span class="op">=</span>[<span class="st">"fecha"</span>], how<span class="op">=</span><span class="st">"inner"</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Filtro solo las filas que contegan turbidez</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>df_turb <span class="op">=</span> df_combinado[(df_combinado[<span class="st">"param"</span>] <span class="op">==</span> <span class="st">"turbidez"</span>)]</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Elimino las columnas que no nos interesan</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>df_turb_band <span class="op">=</span> df_turb.drop(columns<span class="op">=</span>[<span class="st">"fecha"</span>,<span class="st">"param"</span>])</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Cambiamos el nombre de la columna "valor" por el de "turbidez</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>df_turb_band.rename(columns<span class="op">=</span>{<span class="st">"valor"</span>: <span class="st">"turbidez"</span>}, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Pivotamos la tabla</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>df_final <span class="op">=</span> df_turb_band.pivot_table(</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        index<span class="op">=</span><span class="st">"turbidez"</span>,</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"banda"</span>,</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>        values<span class="op">=</span><span class="st">"reflec"</span>,)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos tabla final</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>df_final.to_csv(<span class="vs">r"D:</span><span class="dv">\M</span><span class="vs">onitoreo 2026</span><span class="er">\</span><span class="vs">Output</span><span class="er">\</span><span class="vs">csv</span><span class="dv">\d</span><span class="vs">f_final</span><span class="dv">.</span><span class="vs">csv"</span>, index<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="adef153f" class="cell" data-message="false" data-execution_count="7">
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">turbidez</th>
+<th data-quarto-table-cell-role="th">B01</th>
+<th data-quarto-table-cell-role="th">B02</th>
+<th data-quarto-table-cell-role="th">B03</th>
+<th data-quarto-table-cell-role="th">B04</th>
+<th data-quarto-table-cell-role="th">B05</th>
+<th data-quarto-table-cell-role="th">B06</th>
+<th data-quarto-table-cell-role="th">B07</th>
+<th data-quarto-table-cell-role="th">B08</th>
+<th data-quarto-table-cell-role="th">B11</th>
+<th data-quarto-table-cell-role="th">B12</th>
+<th data-quarto-table-cell-role="th">B8A</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>26.416667</td>
+<td>0.163765</td>
+<td>0.133815</td>
+<td>0.113380</td>
+<td>0.100975</td>
+<td>0.092420</td>
+<td>0.082690</td>
+<td>0.085585</td>
+<td>0.070600</td>
+<td>0.033900</td>
+<td>0.020845</td>
+<td>0.074250</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>26.650000</td>
+<td>0.124000</td>
+<td>0.102195</td>
+<td>0.099590</td>
+<td>0.078690</td>
+<td>0.069760</td>
+<td>0.048095</td>
+<td>0.051555</td>
+<td>0.041080</td>
+<td>0.025715</td>
+<td>0.016775</td>
+<td>0.043510</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>27.450000</td>
+<td>0.114975</td>
+<td>0.089995</td>
+<td>0.082655</td>
+<td>0.076975</td>
+<td>0.067930</td>
+<td>0.041710</td>
+<td>0.043160</td>
+<td>0.035355</td>
+<td>0.019175</td>
+<td>0.012385</td>
+<td>0.032930</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>27.666667</td>
+<td>0.127195</td>
+<td>0.101405</td>
+<td>0.089160</td>
+<td>0.079145</td>
+<td>0.069715</td>
+<td>0.051255</td>
+<td>0.052000</td>
+<td>0.044325</td>
+<td>0.023130</td>
+<td>0.015685</td>
+<td>0.043835</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>28.816667</td>
+<td>0.118150</td>
+<td>0.094560</td>
+<td>0.087575</td>
+<td>0.087335</td>
+<td>0.078650</td>
+<td>0.048175</td>
+<td>0.049565</td>
+<td>0.040745</td>
+<td>0.019950</td>
+<td>0.013145</td>
+<td>0.036645</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="entrenamiento-del-modelo-con-todas-las-bandas" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Entrenamiento del modelo con todas las bandas</h1>
+<p>Tabla con hiperparámetros optimizados</p>
+<div id="cell-tabla_optuna" class="cell" data-message="false" data-execution_count="9">
+<div id="tabla_optuna" class="cell-output cell-output-display" data-execution_count="7">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">max_depth</th>
+<th data-quarto-table-cell-role="th">learning_rate</th>
+<th data-quarto-table-cell-role="th">subsample</th>
+<th data-quarto-table-cell-role="th">colsample_bytree</th>
+<th data-quarto-table-cell-role="th">n_estimators</th>
+<th data-quarto-table-cell-role="th">R2_promedio_CV</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>10</td>
+<td>0.158273</td>
+<td>0.71368</td>
+<td>0.784281</td>
+<td>451</td>
+<td>0.780991</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Cargo Modelo</p>
+<p>Gráfica de métricas de desempeño</p>
+<div id="cell-xgb_optuna_plot" class="cell" data-message="false" data-execution_count="11">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/xgb_optuna_plot-output-1.png" id="xgb_optuna_plot" width="479" height="414" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="entrenamiento-del-modelo-excluyendo-bandas-1-11-y-12" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Entrenamiento del modelo excluyendo bandas 1, 11 y 12</h1>
+<p>Tabla con hiperparámetros optimizados</p>
+<div id="cell-tabla_optuna2" class="cell" data-message="false" data-execution_count="13">
+<div id="tabla_optuna2" class="cell-output cell-output-display" data-execution_count="10">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">max_depth</th>
+<th data-quarto-table-cell-role="th">learning_rate</th>
+<th data-quarto-table-cell-role="th">subsample</th>
+<th data-quarto-table-cell-role="th">colsample_bytree</th>
+<th data-quarto-table-cell-role="th">n_estimators</th>
+<th data-quarto-table-cell-role="th">R2_promedio_CV</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>10</td>
+<td>0.012086</td>
+<td>0.673775</td>
+<td>0.730302</td>
+<td>310</td>
+<td>0.740884</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Cargo modelo</p>
+<p>Gráfica de métricas de desempeño</p>
+<div id="cell-xgb_optuna_plot2" class="cell" data-message="false" data-execution_count="15">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/xgb_optuna_plot2-output-1.png" id="xgb_optuna_plot2" width="471" height="414" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="estimación-sobre-el-río-paraná-a-partir-del-modelo-sin-bandas-111-y-12-de-sentinel-2" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="estimación-sobre-el-río-paraná-a-partir-del-modelo-sin-bandas-111-y-12-de-sentinel-2"><span class="header-section-number">4.1</span> Estimación sobre el río Paraná a partir del modelo sin Bandas 1,11 y 12 de Sentinel-2</h2>
+<p>Defino 2 puntos de interés, sobre el río paraná</p>
+<ul>
+<li>Punto 1 (Chaco)</li>
+<li>Punto 2 (Corrientes)</li>
+</ul>
+<div id="37631c6a" class="cell" data-execution_count="16">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ee</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Inicializar con tu proyecto</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>ee.Initialize(project<span class="op">=</span><span class="st">'gistaq-2026'</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Definir los puntos de interés</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>punto_1 <span class="op">=</span> ee.Geometry.Point([<span class="op">-</span><span class="fl">58.86813681183558</span>, <span class="op">-</span><span class="fl">27.46512351698905</span>])</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>punto_2 <span class="op">=</span> ee.Geometry.Point([<span class="op">-</span><span class="fl">58.8582877403329</span>, <span class="op">-</span><span class="fl">27.473538528861454</span>])</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># punto_1 (Chaco) , punto_2 (Corrientes)</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Ubicación de los puntos</p>
+<iframe src="Output\Modelo XGBoost sin b1,11 y 12\mapa_puntos_turbidezXGB.html" width="100%" height="500px" style="border: none;">
+</iframe>
+<p>Importo imágenes de Sentinel-2</p>
+<div id="cdf0b12c" class="cell" data-execution_count="18">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ee</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Agrupo los puntos</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>puntos_busqueda <span class="op">=</span> ee.FeatureCollection([</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    ee.Feature(punto_1, {<span class="st">'id_simple'</span>: <span class="dv">1</span>}),</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    ee.Feature(punto_2, {<span class="st">'id_simple'</span>: <span class="dv">2</span>})</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Mapeo de bandas de GEE hacia las columnas del modelo</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>bandas_gee <span class="op">=</span> [<span class="st">"B2"</span>, <span class="st">"B3"</span>, <span class="st">"B4"</span>, <span class="st">"B5"</span>, <span class="st">"B6"</span>, <span class="st">"B7"</span>, <span class="st">"B8"</span>, <span class="st">"B8A"</span>]</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>bandas_modelo <span class="op">=</span> [<span class="st">"B02"</span>, <span class="st">"B03"</span>, <span class="st">"B04"</span>, <span class="st">"B05"</span>, <span class="st">"B06"</span>, <span class="st">"B07"</span>, <span class="st">"B08"</span>, <span class="st">"B8A"</span>]</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Filtro la colección por fecha y lugar</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>coleccion <span class="op">=</span> (ee.ImageCollection(<span class="st">"COPERNICUS/S2_SR_HARMONIZED"</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>             .filterDate(<span class="st">'2025-01-01'</span>, <span class="st">'2026-07-31'</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>             .filterBounds(puntos_busqueda))</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Función interna para extraer los datos de cada imagen de la serie</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extraer_datos_por_imagen(img):</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    fecha <span class="op">=</span> img.date().<span class="bu">format</span>(<span class="st">'YYYY-MM-DD'</span>)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> img.select(bandas_gee <span class="op">+</span> [<span class="st">"SCL"</span>]).reduceRegions(</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>        collection<span class="op">=</span>puntos_busqueda,</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>        reducer<span class="op">=</span>ee.Reducer.first(),</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>        scale<span class="op">=</span><span class="dv">10</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    ).<span class="bu">map</span>(<span class="kw">lambda</span> f: f.<span class="bu">set</span>(<span class="st">'fecha_captura'</span>, fecha))</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Aplicar la función a toda la colección y aplanar los resultados</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>valores_historicos <span class="op">=</span> coleccion.<span class="bu">map</span>(extraer_datos_por_imagen).flatten()</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Descargando serie temporal desde Earth Engine..."</span>)</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>datos_extraidos <span class="op">=</span> valores_historicos.getInfo()[<span class="st">'features'</span>]</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Lista para almacenar las filas válidas</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>filas_validas <span class="op">=</span> []</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> feature <span class="kw">in</span> datos_extraidos:</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>    propiedades <span class="op">=</span> feature[<span class="st">'properties'</span>]</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    clase_scl <span class="op">=</span> propiedades.get(<span class="st">'SCL'</span>)</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Evaluar el SCL (Valor 6 = Agua)</span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> clase_scl <span class="op">==</span> <span class="dv">6</span>:</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>        registro_pixel <span class="op">=</span> {</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Fecha'</span>: propiedades.get(<span class="st">'fecha_captura'</span>),</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Punto'</span>: propiedades.get(<span class="st">'id_simple'</span>) <span class="co"># Aquí se guarda solo 1 o 2</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Mapear nombres de bandas y dividir por 10,000</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> b_gee, b_mod <span class="kw">in</span> <span class="bu">zip</span>(bandas_gee, bandas_modelo):</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>            valor_original <span class="op">=</span> propiedades.get(b_gee)</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> valor_original <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>                registro_pixel[b_mod] <span class="op">=</span> valor_original <span class="op">/</span> <span class="fl">10000.0</span></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>                registro_pixel[b_mod] <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>        filas_validas.append(registro_pixel)</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Crear el DataFrame y exportarlo a CSV</span></span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> filas_validas:</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Definimos el orden de las columnas con los metadatos al inicio</span></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>    columnas_csv <span class="op">=</span> [<span class="st">'Fecha'</span>, <span class="st">'Punto'</span>] <span class="op">+</span> bandas_modelo</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.DataFrame(filas_validas, columns<span class="op">=</span>columnas_csv)</span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>    ruta_carpeta <span class="op">=</span> Path(<span class="vs">r"D:</span><span class="dv">\M</span><span class="vs">onitoreo 2026</span><span class="er">\</span><span class="vs">Output</span><span class="dv">\M</span><span class="vs">odelo XGBoost sin b1,11 y 12</span><span class="er">\</span><span class="vs">Reflectancias Sentinel-2 2025</span><span class="dv">.</span><span class="vs">csv"</span>)</span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>    df.to_csv(ruta_carpeta, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Nueva vista previa del contenido del CSV:"</span>)</span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(df.head().to_string(index<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"No se encontraron registros de agua limpia en ese periodo."</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>EstimaciÓn de la turbidez</p>
+<div id="64eb2aa5" class="cell" data-execution_count="19">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> xgboost <span class="im">as</span> xgb</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Rutas de tus archivos</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>ruta_modelo <span class="op">=</span> <span class="vs">r"D:</span><span class="dv">\M</span><span class="vs">onitoreo 2026</span><span class="er">\</span><span class="vs">Output</span><span class="er">\</span><span class="vs">Estimaciones turbidez XBG 2026</span><span class="dv">\m</span><span class="vs">odelo_xgboost_optuna</span><span class="dv">.</span><span class="vs">json"</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>nombre_entrada <span class="op">=</span> <span class="vs">r"D:</span><span class="dv">\M</span><span class="vs">onitoreo 2026</span><span class="er">\</span><span class="vs">Output</span><span class="dv">\M</span><span class="vs">odelo XGBoost sin b1,11 y 12</span><span class="er">\</span><span class="vs">Reflectancias Sentinel-2 2025</span><span class="dv">.</span><span class="vs">csv"</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>nombre_salida <span class="op">=</span> <span class="vs">r"D:</span><span class="dv">\M</span><span class="vs">onitoreo 2026</span><span class="er">\</span><span class="vs">Output</span><span class="dv">\M</span><span class="vs">odelo XGBoost sin b1,11 y 12</span><span class="er">\</span><span class="vs">Turbidez</span><span class="dv">.</span><span class="vs">csv"</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Cargar el CSV con las reflectancias de Sentinel-2</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(nombre_entrada):</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(<span class="ss">f"No se encontró el archivo </span><span class="sc">{</span>nombre_entrada<span class="sc">}</span><span class="ss">. Asegúrate de ejecutar primero el script de Earth Engine."</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>df_datos <span class="op">=</span> pd.read_csv(nombre_entrada)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Inicializar y cargar tu modelo XGBoost entrenado con Optuna</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Cargando modelo XGBoost..."</span>)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>modelo <span class="op">=</span> xgb.XGBRegressor()</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>modelo.load_model(ruta_modelo)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Seleccionar estrictamente las columnas con las que se entrenó el modelo</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>bandas_modelo <span class="op">=</span> [<span class="st">"B02"</span>, <span class="st">"B03"</span>, <span class="st">"B04"</span>, <span class="st">"B05"</span>, <span class="st">"B06"</span>, <span class="st">"B07"</span>, <span class="st">"B08"</span>, <span class="st">"B8A"</span>]</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>X_prediccion <span class="op">=</span> df_datos[bandas_modelo]</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Calculando turbidez para </span><span class="sc">{</span><span class="bu">len</span>(df_datos)<span class="sc">}</span><span class="ss"> registros..."</span>)</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Realizar la predicción e integrar el resultado al DataFrame</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>df_datos[<span class="st">'Turbidez_Estimada'</span>] <span class="op">=</span> modelo.predict(X_prediccion)</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Exportar los resultados a un nuevo archivo CSV</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>df_datos.to_csv(nombre_salida, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"¡Proceso terminado! Archivo guardado correctamente en: </span><span class="sc">{</span>os<span class="sc">.</span>path<span class="sc">.</span>abspath(nombre_salida)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="co"># 7. Mostrar una vista previa de las estimaciones en pantalla</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Vista previa de las predicciones:"</span>)</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>columnas_vista <span class="op">=</span> [<span class="st">'Fecha'</span>, <span class="st">'Punto'</span>, <span class="st">'Turbidez_Estimada'</span>]</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df_datos[columnas_vista].head().to_string(index<span class="op">=</span><span class="va">False</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Gráfico de estimación de la turbidez</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Output\Modelo XGBoost sin b1,11 y 12\Grafico_Turbidez_sinb1_11_12.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Gráfico de estimación de la turbidez</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="análisis-píxel-a-píxel" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Análisis píxel a píxel</h1>
+<section id="defino-zona-de-interés" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="defino-zona-de-interés"><span class="header-section-number">5.1</span> Defino zona de interés</h2>
+<p>Para este el análisis pixel a pixel se define una región de interés de aproximadamente 2000 m x 2000 m, centrado en la coordenada -58.86940982429709, -27.482608080715305. Dicha región se escuentra alejada de las costas de las provincia de Chaco y Corrientes, con el objetivo de evitar zonas de arena y baja profundidad duante las temporadas de bajante del río Paraná, con esto tenemos más probabilidad de tener la mayor cantidad de píxeles de agua disponibles por cada fecha.</p>
+<p><strong>Región de interés</strong></p>
+<iframe src="Output\Análisis pixel a pixel\mapa_area_de_interes.html" width="100%" height="500px" style="border: none;">
+</iframe>
+</section>
+<section id="selección-de-bandas-de-interés-de-sentinel-2" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="selección-de-bandas-de-interés-de-sentinel-2"><span class="header-section-number">5.2</span> Selección de bandas de interés de Sentinel-2</h2>
+<p>Se procede a la descarga de imágenes satelitales, el raster de cada fecha incluye las siguientes bandas <strong>B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B11, B12</strong> y la banda de clasificación de pixel <strong>“SCL”</strong></p>
+<p>A continuación se detallan la información que puede contener SCL, para clasificar cada pixel.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Valor</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Saturada o defectuosa</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Píxeles de área oscura</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Sombras de nubes</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Vegetación</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Suelos desnudos</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Agua</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Baja probabilidad de nubes / nubes sin clasificar</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Probabilidad media de nubes</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>Probabilidad alta de nubes</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>Cirro</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>Nieve o hielo</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="descarga-de-imágenes-desde-google-earth-engine" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="descarga-de-imágenes-desde-google-earth-engine"><span class="header-section-number">5.3</span> Descarga de imágenes desde Google Earth Engine</h2>
+<p>Se usó la banda SCL como criterio para la descarga de las imágenes, si por lo menos el 70% de los píxles de la zona de interés son de agua (es decir SCL=6) se procede a la descarga, de lo contrario se descarta la descarga de esa fecha.</p>
+<p>Se realiza la búsqueda para todo el año 2025.</p>
+<p>En total se descargaron 45 imágenes que cumplieron con esta condición, se realizó la revisión de cada de ella.</p>
+<p>Finalmente quedaron 17 imágenes que fueron seleccionadas para su procesamiento. El resto fué descartada, ya sea porque contenian muchas nubes o tenían mucho ruido.</p>
+</section>
+<section id="estimación-de-la-turbidez-para-cada-fecha" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="estimación-de-la-turbidez-para-cada-fecha"><span class="header-section-number">5.4</span> Estimación de la turbidez para cada fecha</h2>
+<p>A las imágenes seleccionadas se le aplicó un modelo de estimación de turbidez, filtrando los pixeles que no sean agua con la ayuda de la banda SCL.</p>
+</section>
+<section id="mapas-sobre-la-región-de-interés" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="mapas-sobre-la-región-de-interés"><span class="header-section-number">5.5</span> Mapas sobre la región de interés</h2>
+<p><strong>Mapa de pendiente</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Output\Análisis pixel a pixel\Mapas png\PENDIENTE.png" class="img-fluid figure-img" style="width:80.0%"></p>
+<figcaption>Mapa pendiente</figcaption>
+</figure>
+</div>
+<p>Para el año 2025, se observa que la turbidez aumentó en promedio 2 NTU hacia el lado de la costa correntina y disminuyó 38 NTU en las proximidades la costa chaqueña.</p>
+<p><strong>Mapa de máximos</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Output\Análisis pixel a pixel\Mapas png\MAXIMOS.png" class="img-fluid figure-img" style="width:80.0%"></p>
+<figcaption>Mapa máximos</figcaption>
+</figure>
+</div>
+<p><strong>Mapa de mínimos</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Output\Análisis pixel a pixel\Mapas png\MINIMOS.png" class="img-fluid figure-img" style="width:80.0%"></p>
+<figcaption>Mapa mínimos</figcaption>
+</figure>
+</div>
+<p><strong>Índice MENSI</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Output\Análisis pixel a pixel\Mapas png\MENSI.png" class="img-fluid figure-img" style="width:80.0%"></p>
+<figcaption>Mapa MENSI</figcaption>
+</figure>
+</div>
+<p>El cálculo del índice MENSI para el análisis píxel a píxel se estructuró en dos etapas secuenciales:</p>
+<ul>
+<li><p>1 - Normalización Espacial (por fecha individual): Para cada fecha individual, se calculó el valor promedio de turbidez de todo el cuerpo de agua . Posteriormente, cada píxel de esa misma fecha se dividió por dicho promedio.</p></li>
+<li><p>2 - Integración Temporal: Finalmente, para cada píxel individual, se sumaron sus valores relativos de todas las fechas y el resultado se dividió por el número total de imágenes analizadas.</p></li>
+</ul>
+<p>Si el valor del pixel es mayor que el promedio, el valor del índice MENSI será mayor que 1.</p>
+<p>Si el valor del píxel es menor que el promedio, MENSI será menor que 1.</p>
+<p>Si el índice es un buen indicador de las condiciones de calidad del agua. Las áreas con valores de índice menores que 1 tienen mejores condiciones de calidad.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
