@@ -1,5 +1,5 @@
 ---
-title: "Pestaña2"
+title: "Descarga de datos de Google Earth Engine"
 
 brand: _brand.yml
 freeze: auto
@@ -23,5 +23,313 @@ format:
 
 ---
 
-      
-# Próximamente
+
+# Descarga de imágenes satelitales en Google Earth Engine 
+
+Conexión con Google Earth Engine
+
+```{python}
+#| output: false
+import ee
+
+try:
+    # Configuramos el método para que lea tus credenciales locales guardadas
+    ee.Initialize(project='gistaq-2026')
+    print("Conexión exitosa.")
+except Exception as e:
+    print(f"Error detectado: {e}")
+```
+
+
+Defino la zona de interés. Podemos definir la zona de la cual nos interesa extraer los valores de reflectancia. Alguna de esllas son 
+
+- **ROI** Región de interés, por ejemplo: un rectángulo.
+
+Un rectángulo en Google Earth Engine se define por dos puntos opuestos:
+
+ - Esquina Inferior Izquierda (Suroeste)
+ - Esquina Superior Derecha (Noreste)
+
+Formato: [longitud_oeste, latitud_sur, longitud_este, latitud_norte]
+
+- **POI** Punto de interés.
+
+ Se define en formato: [longitud, latitud]
+
+- **Buffer** (Área de influencia): Crea un polígono alrededor de un punto, línea o polígono a una distancia específica. Por ejemplo: un radio de 5 metros alrededor de un punto.
+
+**Definimos 1 punto de práctica**
+
+```{python}
+#| code-fold: true
+#| output: false
+
+poi =  ee.Geometry.Point([-58.874118, -27.479538])
+
+print(f"Punto de interés definido")
+```
+
+Seleccionamos la colección de Landsat-8
+
+```{python}
+#| code-fold: true
+
+# Trabajo con la colección TOA y filtro por el POI de prueba y tango de fecha, seleccionamos la imágen más despejada
+
+dataset = (ee.ImageCollection('LANDSAT/LC08/C02/T1_TOA')
+           .filterDate('2017-01-01', '2017-12-31')
+           .filterBounds(poi)          # <--- Filtra SOLO tu zona
+           .filter(ee.Filter.lt('CLOUD_COVER', 10))
+           .sort('CLOUD_COVER')        # Ordena de menor a mayor nubes
+           .first())                   # <--- Toma SOLO la primera (la más limpia)
+```
+
+Vizualizacion en el mapa
+
+```{python}
+#| code-fold: true
+#| label: mapa-landsat1
+#| eval: false
+import ee
+import geemap
+
+# Inicializa usando tu ID de proyecto de Google Cloud
+ee.Initialize(project='gistaq-2026')
+
+true_color = dataset.select(['B4', 'B3', 'B2'])
+vis_params = {'min': 0.0, 'max': 0.4, 'bands': ['B4', 'B3', 'B2']}
+
+m = geemap.Map(backend="folium")
+m.centerObject(poi, zoom=14) 
+m.addLayer(true_color, vis_params, 'Landsat 8 TOA (2017)')
+m.addLayer(poi, {'color': 'FF0000'}, 'POI')
+
+# Guardamos el mapa localmente como un archivo HTML estático, para luego insertarlo en el sitio
+m.to_html("D:/Monitoreo 2026/Output/mapas/mapa1.html")
+
+```
+
+<iframe src="Output/mapas/mapa1.html" width="100%" height="500px" style="border:none;"></iframe>
+
+
+**Extracción de reflectancias para 1 punto en particular**
+
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+
+# 1. Coordenadas del punto (Longitud, Latitud)
+punto_prueba = ee.Geometry.Point([-58.874118, -27.479538])
+
+# 2. Seleccionamos la primera imagen disponible de la colección Landsat 8 TOA
+imagen = (ee.ImageCollection('LANDSAT/LC08/C02/T1_TOA')
+          .filterBounds(punto_prueba)
+          .first()) # Tomamos la primera escena sin filtros
+
+# 3. Obtengo la lista completa de todas las bandas que existen dentro de esta imagen
+
+todas_las_bandas = imagen.bandNames().getInfo()
+
+# 4. Extraer los valores de todas las bandas para el punto del píxel
+
+valores_reducidos = imagen.reduceRegion(
+    reducer=ee.Reducer.first(),
+    geometry=punto_prueba,
+    scale=30
+).getInfo()
+
+# 5. Extraer metadatos clave de la imagen para sumarlos al análisis
+
+metadatos = {
+    'ID_IMAGEN': imagen.id().getInfo(),
+    'FECHA_ADQUISICION': imagen.date().format('YYYY-MM-DD HH:mm:ss').getInfo(),
+    'NUBOSIDAD_ESCENA_PORCENTAJE': imagen.get('CLOUD_COVER').getInfo()
+}
+
+# 6. Unificar metadatos y valores de las bandas en una estructura plana
+datos_completos = {**metadatos, **valores_reducidos}
+
+# 7. Convertir a un DataFrame de Pandas (Estructura de tabla)
+# Transponemos para que las variables queden en filas y sea más cómodo de leer
+df = pd.DataFrame(list(datos_completos.items()), columns=['Componente / Banda', 'Valor Registrado'])
+
+# 8. Guardar el archivo en tu computadora como CSV
+archivo_salida = "analisis_crudo_pixel.csv"
+df.to_csv(archivo_salida, index=False)
+
+# Visualización de los datos
+
+print(df.to_string(index=False)) # Imprime la tabla completa sin recortes en la consola
+
+```
+
+
+Flujo de trabajo.
+
+
+El Flujo de Trabajo Definitivo
+
+Búsqueda y Filtrado Temporal (Nivel Escena
+
+1. Buscas en el catálogo de Landsat 8 para tus coordenadas.
+
+Usas el metadato global CLOUD_COVER para descartar de golpe los días donde toda la región estuvo bajo tormentas (por ejemplo, descartas todo lo que tenga más del 20% o 30% de nubes).
+
+2. Limpieza Quirúrgica (Nivel Píxel con QA_PIXEL)
+
+Abres las imágenes sobrevivientes y analizas la matriz del QA_PIXEL [Landsat]
+
+Descartas (enmascaras) individualmente los píxeles donde el binario indique nubes o sombras [Landsat]. Si en tu grilla de 3x3 hay un píxel con nube, ese píxel se apaga y te quedas solo con los píxeles sanos.
+
+3. Corrección Atmosférica (Nivel Píxel Individual)
+
+Aplicas tu algoritmo de corrección atmosférica sobre cada uno de los píxeles limpios que quedaron en la grilla.
+
+Esto transforma los valores de reflectancia TOA (Tope de la Atmósfera) a Reflectancia de Superficie (BOA), eliminando el ruido del aire, el polvo y el vapor de agua de forma matemática para cada coordenada exacta.
+
+4. Reducción Espacial (El Promedio de la Grilla)
+
+Ahora que tienes píxeles que son 100% agua pura, libres de nubes y corregidos atmosféricamente, calculas el promedio matemático banda por banda de tu grilla.
+
+Este valor promedio final será el dato más puro, estable y libre de anomalías locales para analizar los componentes del río (como sedimentos o clorofila).
+
+
+Defino grilla de 3x3 pixeles
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+
+# 1. Punto central en el Río Paraná
+punto = ee.Geometry.Point([-58.874118, -27.479538])
+
+# 2. Generar el área de 3x3 píxeles de Landsat 8 (90x90 metros aprox)
+# Crea un buffer de 45 metros hacia cada lado y obtenemos su rectángulo (bounds)
+grilla_3x3 = punto.buffer(45).bounds()
+
+# 3. Selecciona la colección TOA y filtrar ROI y fecha
+dataset = (ee.ImageCollection('LANDSAT/LC08/C02/T1_TOA')
+           .filterDate('2017-01-01', '2017-12-31')
+           .filterBounds(grilla_3x3)          # <--- Filtra SOLO tu zona
+           .filter(ee.Filter.lt('CLOUD_COVER', 10))
+           .sort('CLOUD_COVER')        # Ordena de menor a mayor nubes
+           .first())                   # <--- Toma SOLO la primera (la más limpia)
+```
+
+
+Localización de la zona de 3x3 píxeles en el mapa
+
+```{python}
+#| code-fould: true
+#| label: mapa-landsat2
+#| eval: false
+
+import ee
+import geemap
+
+# 4. Selecciono bandas True Color (B4=Rojo, B3=Verde, B2=Azul)
+true_color = dataset.select(['B4', 'B3', 'B2'])
+
+# 5. Configuración de  visualización
+
+vis_params = {
+    'min': 0.0,
+    'max': 0.4,
+    'bands': ['B4', 'B3', 'B2']
+}
+
+# 6. el mapa centrado en tu ROI
+m = geemap.Map(backend="folium")
+m.centerObject(grilla_3x3, zoom=14)  # Centra el mapa en tu ROI con zoom 10
+
+# Añadir la imagen
+m.addLayer(true_color, vis_params, 'Landsat 8 TOA (2017)')
+
+# Añadir un borde a tu ROI para que se vea mejor
+m.addLayer(grilla_3x3, {'color': 'FF0000'}, 'ROI')
+
+# === SOLUCIÓN EXPORTACIÓN QUARTO ===
+# Guarda el mapa localmente como un archivo HTML estático
+m.to_html("D:/Monitoreo 2026/Output/mapas/mapa2.html")
+m
+```
+
+<iframe src="Output/mapas/mapa2.html" width="100%" height="500px" style="border:none;"></iframe>
+
+
+Extracción de los datos de una imagen 
+
+```{python}
+#| code-fold: true
+
+import pandas as pd
+import numpy as np
+
+# 1. Tu punto central en el Río Paraná
+punto_prueba = ee.Geometry.Point([-58.874118, -27.479538])
+
+# 2. Tomo la primera imagen disponible de la colección
+imagen =(ee.ImageCollection('LANDSAT/LC08/C02/T1_TOA')
+           .filterDate('2017-01-01', '2017-12-31')
+           .filterBounds(punto_prueba)          
+           .filter(ee.Filter.lt('CLOUD_COVER', 10))
+           .sort('CLOUD_COVER')        
+           .first())                   
+
+
+
+# 3. Definir las bandas que te interesan
+bandas_interes = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8','B9', 'B10', 'B11', 'QA_PIXEL']
+imagen_seleccionada = imagen.select(bandas_interes)
+
+# 4. Crear la vecindad de 3x3 usando los argumentos correctos de la API de Python
+kernel = ee.Kernel.rectangle(xRadius=1, yRadius=1, units='pixels')
+imagen_grilla = imagen_seleccionada.neighborhoodToArray(kernel)
+
+# 5. Extraer los valores concentrados en el punto de prueba
+valores_reducidos = imagen_grilla.reduceRegion(
+    reducer=ee.Reducer.first(),
+    geometry=punto_prueba,
+    scale=30
+).getInfo()
+
+
+lista_pixeles = []
+
+
+matriz_base = np.array(valores_reducidos.get('B1'))
+filas, columnas = matriz_base.shape
+
+print(f"Dimensiones de la grilla detectada: {filas}x{columnas} píxeles.\n")
+
+for i in range(filas):
+    for j in range(columnas):
+        datos_pixel = {
+            'Fila_Grilla': i + 1,
+            'Columna_Grilla': j + 1
+        }
+        # Extraer el valor de cada banda indexando la posición [i][j]
+        for banda in bandas_interes:
+            matriz_banda = valores_reducidos.get(banda)
+            if matriz_banda is not None:
+                datos_pixel[banda] = matriz_banda[i][j]
+            else:
+                datos_pixel[banda] = None
+                
+        lista_pixeles.append(datos_pixel)
+
+ 
+df = pd.DataFrame(lista_pixeles)
+archivo_salida = "grilla_3x3_corregida.csv"
+df.to_csv(archivo_salida, index=False)
+
+
+print("=" * 65)
+print("GRILLA 3X3 REFLECTANCIA TOA")
+print("=" * 65)
+print(df.to_string(index=False))
+print("=" * 65)
+```
