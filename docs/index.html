@@ -225,7 +225,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Fecha de publicación</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">13 de noviembre de 2026</p>
+      <p class="date">17 de noviembre de 2026</p>
     </div>
   </div>
   
@@ -256,7 +256,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Punto 1 (Chaco)</li>
 <li>Punto 2 (Corrientes)</li>
 </ul>
-<div id="1a25a182" class="cell" data-execution_count="1">
+<div id="da79453c" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Código</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ee</span>
@@ -275,8 +275,196 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Ubicación de los puntos</p>
 <iframe src="Output\mapas\mapa_puntos_turbidez.html" width="100%" height="500px" style="border: none;">
 </iframe>
+<p>Nuevo mapa</p>
+<div id="cell-mapa-puntos-turbidezfolium" class="cell" data-execution_count="3">
+<div id="mapa-puntos-turbidezfolium" class="cell-output cell-output-display" data-execution_count="2">
+<div style="width:100%;"><div style="position:relative;width:100%;height:0;padding-bottom:60%;"><span style="color:#565656">Make this Notebook Trusted to load map: File -&gt; Trust Notebook</span><iframe srcdoc="<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv=&quot;content-type&quot; content=&quot;text/html; charset=UTF-8&quot; />
+    <script src=&quot;https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js&quot;></script>
+    <script src=&quot;https://code.jquery.com/jquery-3.7.1.min.js&quot;></script>
+    <script src=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js&quot;></script>
+    <script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js&quot;></script>
+    <link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css&quot;/>
+    <link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css&quot;/>
+    <link rel=&quot;stylesheet&quot; href=&quot;https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css&quot;/>
+    <link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css&quot;/>
+    <link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css&quot;/>
+    <link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css&quot;/>
+    
+            <meta name=&quot;viewport&quot; content=&quot;width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; />
+            <style>
+                #map_0dd02829d4d78df76c45676c676af204 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+            <div class=&quot;folium-map&quot; id=&quot;map_0dd02829d4d78df76c45676c676af204&quot; ></div>
+        
+</body>
+<script>
+    
+    
+            var map_0dd02829d4d78df76c45676c676af204 = L.map(
+                &quot;map_0dd02829d4d78df76c45676c676af204&quot;,
+                {
+                    center: [-27.469331109538942, -58.86321246409222],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  &quot;zoom&quot;: 14,
+  &quot;zoomControl&quot;: true,
+  &quot;preferCanvas&quot;: false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_d6a3862a83a20e7afadfb0c1596cf911 = L.tileLayer(
+                &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
+                {
+  &quot;minZoom&quot;: 0,
+  &quot;maxZoom&quot;: 19,
+  &quot;maxNativeZoom&quot;: 19,
+  &quot;noWrap&quot;: false,
+  &quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;,
+  &quot;subdomains&quot;: &quot;abc&quot;,
+  &quot;detectRetina&quot;: false,
+  &quot;tms&quot;: false,
+  &quot;opacity&quot;: 1,
+}
+
+            );
+        
+    
+            tile_layer_d6a3862a83a20e7afadfb0c1596cf911.addTo(map_0dd02829d4d78df76c45676c676af204);
+        
+    
+            var tile_layer_31949da085d85965bbd7ed214bf9d6b8 = L.tileLayer(
+                &quot;https://google.com{x}\u0026y={y}\u0026z={z}&quot;,
+                {
+  &quot;minZoom&quot;: 0,
+  &quot;maxZoom&quot;: 18,
+  &quot;maxNativeZoom&quot;: 18,
+  &quot;noWrap&quot;: false,
+  &quot;attribution&quot;: &quot;Google&quot;,
+  &quot;subdomains&quot;: &quot;abc&quot;,
+  &quot;detectRetina&quot;: false,
+  &quot;tms&quot;: false,
+  &quot;opacity&quot;: 1,
+}
+
+            );
+        
+    
+            tile_layer_31949da085d85965bbd7ed214bf9d6b8.addTo(map_0dd02829d4d78df76c45676c676af204);
+        
+    
+            var tile_layer_8408f0cf6675b3b212d29925290a15f7 = L.tileLayer(
+                &quot;https://earthengine.googleapis.com/v1/projects/gistaq-2026/maps/2c4ebc02db3a44dcd9d60b6ae19e8569-969b77ac6edeaba1f5b1022ba0c51497/tiles/{z}/{x}/{y}&quot;,
+                {
+  &quot;minZoom&quot;: 0,
+  &quot;maxZoom&quot;: 18,
+  &quot;maxNativeZoom&quot;: 18,
+  &quot;noWrap&quot;: false,
+  &quot;attribution&quot;: &quot;Map Data \u0026copy; \u003ca href=\&quot;https://google.com\&quot;\u003eGoogle Earth Engine\u003c/a\u003e&quot;,
+  &quot;subdomains&quot;: &quot;abc&quot;,
+  &quot;detectRetina&quot;: false,
+  &quot;tms&quot;: false,
+  &quot;opacity&quot;: 1,
+}
+
+            );
+        
+    
+            tile_layer_8408f0cf6675b3b212d29925290a15f7.addTo(map_0dd02829d4d78df76c45676c676af204);
+        
+    
+            var tile_layer_f539515cebaf6bc7d3c36b7a8dda63d8 = L.tileLayer(
+                &quot;https://earthengine.googleapis.com/v1/projects/gistaq-2026/maps/3412dafeef8b1d7fb7f8b33880a755c8-db20a1ef0bd26daacc7992d4a5db37de/tiles/{z}/{x}/{y}&quot;,
+                {
+  &quot;minZoom&quot;: 0,
+  &quot;maxZoom&quot;: 18,
+  &quot;maxNativeZoom&quot;: 18,
+  &quot;noWrap&quot;: false,
+  &quot;attribution&quot;: &quot;Map Data \u0026copy; \u003ca href=\&quot;https://google.com\&quot;\u003eGoogle Earth Engine\u003c/a\u003e&quot;,
+  &quot;subdomains&quot;: &quot;abc&quot;,
+  &quot;detectRetina&quot;: false,
+  &quot;tms&quot;: false,
+  &quot;opacity&quot;: 1,
+}
+
+            );
+        
+    
+            tile_layer_f539515cebaf6bc7d3c36b7a8dda63d8.addTo(map_0dd02829d4d78df76c45676c676af204);
+        
+    
+            var layer_control_cf9ce742ae723ffec4bbd296e58f5456_layers = {
+                base_layers : {
+                    &quot;Mapa base: OpenStreetMap&quot; : tile_layer_d6a3862a83a20e7afadfb0c1596cf911,
+                    &quot;Google Sat\u00e9lite&quot; : tile_layer_31949da085d85965bbd7ed214bf9d6b8,
+                },
+                overlays :  {
+                    &quot;Punto Rojo (Chaco)&quot; : tile_layer_8408f0cf6675b3b212d29925290a15f7,
+                    &quot;Punto Azul (Corrientes)&quot; : tile_layer_f539515cebaf6bc7d3c36b7a8dda63d8,
+                },
+            };
+            let layer_control_cf9ce742ae723ffec4bbd296e58f5456 = L.control.layers(
+                layer_control_cf9ce742ae723ffec4bbd296e58f5456_layers.base_layers,
+                layer_control_cf9ce742ae723ffec4bbd296e58f5456_layers.overlays,
+                {
+  &quot;position&quot;: &quot;topright&quot;,
+  &quot;collapsed&quot;: false,
+  &quot;autoZIndex&quot;: true,
+}
+            ).addTo(map_0dd02829d4d78df76c45676c676af204);
+
+        
+</script>
+</html>" style="position:absolute;width:100%;height:100%;left:0;top:0;border:none !important;" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe></div></div>
+</div>
+</div>
 <p>Importo imágenes de Sentinel-2</p>
-<div id="e55c3ad5" class="cell" data-execution_count="3">
+<div id="f3d36e84" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Código</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Agrupo los puntos</span></span>
@@ -351,7 +539,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>Estimacion de la turbidez</p>
-<div id="d00fe8c6" class="cell" data-execution_count="4">
+<div id="b668ff33" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Código</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -405,7 +593,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1 data-number="2"><span class="header-section-number">2</span> Modelado algoritmo XG Boost para estimación de la turbidez</h1>
 <p>Se entrenará un modelo de machine learning con valores de reflectancia de superficies de Sentinel-2 y datos de turbidez provenientes de la planta potabilizadora “La Toma” de SAMEEP, sobre el riacho Barranqueras.</p>
 <p>Trabajamos con la librería pandas para unir los datos de turbidez y de reflectancia en un único arcivo</p>
-<div id="a474a6a4" class="cell" data-execution_count="6">
+<div id="6437bedc" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Código</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -439,8 +627,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>df_final.to_csv(<span class="vs">r"D:</span><span class="dv">\M</span><span class="vs">onitoreo 2026</span><span class="er">\</span><span class="vs">Output</span><span class="er">\</span><span class="vs">csv</span><span class="dv">\d</span><span class="vs">f_final</span><span class="dv">.</span><span class="vs">csv"</span>, index<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="adef153f" class="cell" data-message="false" data-execution_count="7">
-<div class="cell-output cell-output-display" data-execution_count="6">
+<div id="25b1cd28" class="cell" data-message="false" data-execution_count="8">
+<div class="cell-output cell-output-display" data-execution_count="7">
 <div>
 
 
@@ -548,8 +736,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="entrenamiento-del-modelo-con-todas-las-bandas" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Entrenamiento del modelo con todas las bandas</h1>
 <p>Tabla con hiperparámetros optimizados</p>
-<div id="cell-tabla_optuna" class="cell" data-message="false" data-execution_count="9">
-<div id="tabla_optuna" class="cell-output cell-output-display" data-execution_count="7">
+<div id="cell-tabla_optuna" class="cell" data-message="false" data-execution_count="10">
+<div id="tabla_optuna" class="cell-output cell-output-display" data-execution_count="8">
 <div>
 
 
@@ -583,7 +771,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Cargo Modelo</p>
 <p>Gráfica de métricas de desempeño</p>
-<div id="cell-xgb_optuna_plot" class="cell" data-message="false" data-execution_count="11">
+<div id="cell-xgb_optuna_plot" class="cell" data-message="false" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -596,8 +784,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="entrenamiento-del-modelo-excluyendo-bandas-1-11-y-12" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Entrenamiento del modelo excluyendo bandas 1, 11 y 12</h1>
 <p>Tabla con hiperparámetros optimizados</p>
-<div id="cell-tabla_optuna2" class="cell" data-message="false" data-execution_count="13">
-<div id="tabla_optuna2" class="cell-output cell-output-display" data-execution_count="10">
+<div id="cell-tabla_optuna2" class="cell" data-message="false" data-execution_count="14">
+<div id="tabla_optuna2" class="cell-output cell-output-display" data-execution_count="11">
 <div>
 
 
@@ -631,7 +819,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Cargo modelo</p>
 <p>Gráfica de métricas de desempeño</p>
-<div id="cell-xgb_optuna_plot2" class="cell" data-message="false" data-execution_count="15">
+<div id="cell-xgb_optuna_plot2" class="cell" data-message="false" data-execution_count="16">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -647,7 +835,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Punto 1 (Chaco)</li>
 <li>Punto 2 (Corrientes)</li>
 </ul>
-<div id="37631c6a" class="cell" data-execution_count="16">
+<div id="fee4b485" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>Código</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ee</span>
@@ -667,7 +855,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <iframe src="Output\Modelo XGBoost sin b1,11 y 12\mapa_puntos_turbidezXGB.html" width="100%" height="500px" style="border: none;">
 </iframe>
 <p>Importo imágenes de Sentinel-2</p>
-<div id="cdf0b12c" class="cell" data-execution_count="18">
+<div id="8ff890d7" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>Código</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ee</span>
@@ -747,7 +935,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>EstimaciÓn de la turbidez</p>
-<div id="64eb2aa5" class="cell" data-execution_count="19">
+<div id="3463b031" class="cell" data-execution_count="20">
 <details class="code-fold">
 <summary>Código</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
