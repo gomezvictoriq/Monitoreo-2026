@@ -19,6 +19,15 @@ website:
         text: Google Earth Engine
       - href: pestaña3.qmd
         text: Correción atmosférica
+      - href: pestaña4.qmd
+        text: Estimación Turbidez
+      - href: pestaña5.qmd
+        text: Análisis pixel a pixel
+      - href: pestaña6.qmd
+        text: Modelado con índices espectrales
+      - href: pestaña7.qmd
+        text: Aplicación Transformada de Furier a unaa serie temporal
+        
 
 brand: _brand.yml
 
