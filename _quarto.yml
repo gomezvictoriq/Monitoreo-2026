@@ -3,9 +3,14 @@ project:
   output-dir: docs
   render:
     - index.qmd
-    - pestaña1.qmd
-    - pestaña2.qmd
-    - pestaña3.qmd
+    - pestana1.qmd
+    - pestana2.qmd
+    - pestana3.qmd
+    - pestana4.qmd
+    - pestana5.qmd
+    - pestana6.qmd
+    - pestana7.qmd
+
 
 website:
   title: "Monitoreo 2026"
@@ -13,19 +18,19 @@ website:
     left:
       - href: index.qmd
         text: Página de inicio
-      - href: pestaña1.qmd
+      - href: pestana1.qmd
         text: Relevamiento de datos
-      - href: pestaña2.qmd
+      - href: pestana2.qmd
         text: Google Earth Engine
-      - href: pestaña3.qmd
+      - href: pestana3.qmd
         text: Correción atmosférica
-      - href: pestaña4.qmd
+      - href: pestana4.qmd
         text: Estimación Turbidez
-      - href: pestaña5.qmd
+      - href: pestana5.qmd
         text: Análisis pixel a pixel
-      - href: pestaña6.qmd
+      - href: pestana6.qmd
         text: Modelado con índices espectrales
-      - href: pestaña7.qmd
+      - href: pestana7.qmd
         text: Aplicación Transformada de Furier a unaa serie temporal
         
 

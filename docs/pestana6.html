@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Modelado con índices espectrales – Monitoreo 2026</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./img/logo-gistaq.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-d385e82cc8fc98bd69993604ac8118d4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-1977b6584acc90a4237ecb3ca471f918.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-d385e82cc8fc98bd69993604ac8118d4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./img\logo-gistaq.png" alt="" class="navbar-logo light-content">
+    <img src="./img\logo-gistaq.png" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Monitoreo 2026</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Navegación de palanca" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Página de inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./pestana1.html"> 
+<span class="menu-text">Relevamiento de datos</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./pestana2.html"> 
+<span class="menu-text">Google Earth Engine</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./pestana3.html"> 
+<span class="menu-text">Correción atmosférica</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./pestana4.html"> 
+<span class="menu-text">Estimación Turbidez</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./pestana5.html"> 
+<span class="menu-text">Análisis pixel a pixel</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./pestana6.html" aria-current="page"> 
+<span class="menu-text">Modelado con índices espectrales</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./pestana7.html"> 
+<span class="menu-text">Aplicación Transformada de Furier a unaa serie temporal</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#modelado-con-indices-espectrales" id="toc-modelado-con-indices-espectrales" class="nav-link active" data-scroll-target="#modelado-con-indices-espectrales"><span class="header-section-number">1</span> Modelado con indices espectrales</a>
+  <ul class="collapse">
+  <li><a href="#procesamiento-de-archivos-csv" id="toc-procesamiento-de-archivos-csv" class="nav-link" data-scroll-target="#procesamiento-de-archivos-csv"><span class="header-section-number">1.1</span> Procesamiento de archivos csv</a></li>
+  </ul></li>
+  <li><a href="#ndti" id="toc-ndti" class="nav-link" data-scroll-target="#ndti"><span class="header-section-number">2</span> NDTI ★</a></li>
+  <li><a href="#wri" id="toc-wri" class="nav-link" data-scroll-target="#wri"><span class="header-section-number">3</span> WRI ★</a></li>
+  <li><a href="#s2wi" id="toc-s2wi" class="nav-link" data-scroll-target="#s2wi"><span class="header-section-number">4</span> S2WI</a></li>
+  <li><a href="#rndvi" id="toc-rndvi" class="nav-link" data-scroll-target="#rndvi"><span class="header-section-number">5</span> RNDVI</a></li>
+  <li><a href="#rojoverde" id="toc-rojoverde" class="nav-link" data-scroll-target="#rojoverde"><span class="header-section-number">6</span> ROJO/VERDE ★</a></li>
+  <li><a href="#mnwdi" id="toc-mnwdi" class="nav-link" data-scroll-target="#mnwdi"><span class="header-section-number">7</span> MNWDI</a></li>
+  <li><a href="#nirred" id="toc-nirred" class="nav-link" data-scroll-target="#nirred"><span class="header-section-number">8</span> NIR/RED</a></li>
+  <li><a href="#modelado" id="toc-modelado" class="nav-link" data-scroll-target="#modelado"><span class="header-section-number">9</span> Modelado</a>
+  <ul class="collapse">
+  <li><a href="#modelo-lineal-con-wri" id="toc-modelo-lineal-con-wri" class="nav-link" data-scroll-target="#modelo-lineal-con-wri"><span class="header-section-number">9.1</span> Modelo lineal con WRI</a></li>
+  <li><a href="#modelo-lineal-con-ndti" id="toc-modelo-lineal-con-ndti" class="nav-link" data-scroll-target="#modelo-lineal-con-ndti"><span class="header-section-number">9.2</span> Modelo lineal con NDTI</a></li>
+  <li><a href="#modelo-lineal-con-cociente-de-bandas-rojoverde" id="toc-modelo-lineal-con-cociente-de-bandas-rojoverde" class="nav-link" data-scroll-target="#modelo-lineal-con-cociente-de-bandas-rojoverde"><span class="header-section-number">9.3</span> Modelo lineal con cociente de bandas ROJO/VERDE</a></li>
+  <li><a href="#mapas" id="toc-mapas" class="nav-link" data-scroll-target="#mapas"><span class="header-section-number">9.4</span> Mapas</a></li>
+  </ul></li>
+  <li><a href="#series-temporales-análisis-dentro-de-la-serie-temporal" id="toc-series-temporales-análisis-dentro-de-la-serie-temporal" class="nav-link" data-scroll-target="#series-temporales-análisis-dentro-de-la-serie-temporal"><span class="header-section-number">10</span> Series temporales análisis dentro de la serie temporal</a>
+  <ul class="collapse">
+  <li><a href="#serie-temporal-de-turbidez-quiebres-en-tendencia-y-estacionalidad" id="toc-serie-temporal-de-turbidez-quiebres-en-tendencia-y-estacionalidad" class="nav-link" data-scroll-target="#serie-temporal-de-turbidez-quiebres-en-tendencia-y-estacionalidad"><span class="header-section-number">10.1</span> Serie temporal de turbidez: Quiebres en tendencia y estacionalidad</a></li>
+  <li><a href="#serie-temporal-de-conductividad-quiebres-en-tendencia-y-estacionalidad" id="toc-serie-temporal-de-conductividad-quiebres-en-tendencia-y-estacionalidad" class="nav-link" data-scroll-target="#serie-temporal-de-conductividad-quiebres-en-tendencia-y-estacionalidad"><span class="header-section-number">10.2</span> Serie temporal de conductividad: Quiebres en tendencia y estacionalidad</a></li>
+  <li><a href="#serie-temporal-de-ph-quiebres-en-tendencia-y-estacionalidad" id="toc-serie-temporal-de-ph-quiebres-en-tendencia-y-estacionalidad" class="nav-link" data-scroll-target="#serie-temporal-de-ph-quiebres-en-tendencia-y-estacionalidad"><span class="header-section-number">10.3</span> Serie temporal de pH: Quiebres en tendencia y estacionalidad</a></li>
+  </ul></li>
+  <li><a href="#análisis-con-fft-fast-fourier-transform" id="toc-análisis-con-fft-fast-fourier-transform" class="nav-link" data-scroll-target="#análisis-con-fft-fast-fourier-transform"><span class="header-section-number">11</span> Análisis con FFT (Fast Fourier Transform)</a></li>
+  <li><a href="#análisis-de-serie-temporal-de-turbidez-aplicación-transformada-de-fourier" id="toc-análisis-de-serie-temporal-de-turbidez-aplicación-transformada-de-fourier" class="nav-link" data-scroll-target="#análisis-de-serie-temporal-de-turbidez-aplicación-transformada-de-fourier"><span class="header-section-number">12</span> Análisis de serie temporal de turbidez, aplicación transformada de Fourier</a></li>
+  <li><a href="#análisis-de-serie-temporal-de-conductividad-aplicación-transformada-de-fourier" id="toc-análisis-de-serie-temporal-de-conductividad-aplicación-transformada-de-fourier" class="nav-link" data-scroll-target="#análisis-de-serie-temporal-de-conductividad-aplicación-transformada-de-fourier"><span class="header-section-number">13</span> Análisis de serie temporal de conductividad, aplicación transformada de Fourier</a></li>
+  <li><a href="#análisis-de-serie-temporal-de-ph-aplicación-transformada-de-fourier" id="toc-análisis-de-serie-temporal-de-ph-aplicación-transformada-de-fourier" class="nav-link" data-scroll-target="#análisis-de-serie-temporal-de-ph-aplicación-transformada-de-fourier"><span class="header-section-number">14</span> Análisis de serie temporal de ph, aplicación transformada de Fourier</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content column-page-right" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Modelado con índices espectrales</h1>
+</div>
+
+
+
+<div class="quarto-title-meta column-page-right">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="modelado-con-indices-espectrales" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Modelado con indices espectrales</h1>
+<p><strong>Procesamiento de archivos csv</strong></p>
+<p>Para el procesamiento de los datos se utilizará la librería <em>pandas</em> de Python.</p>
+<section id="procesamiento-de-archivos-csv" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="procesamiento-de-archivos-csv"><span class="header-section-number">1.1</span> Procesamiento de archivos csv</h2>
+<p>Para el procesamiento de los datos se utilizará la librería <em>pandas</em> de Python.</p>
+<p>En el proyecto tenemos dos archivos .csv que contienen los datos:</p>
+<p>-base_de_datos_lab.csv → contiene resultados de laboratorio</p>
+<p>-base_de_datos_gis.csv → contiene datos espectrales</p>
+<p>Los datos útiles a este sitio están ordenanos de la siguiente forma. (Solo se muestran las 5 primeras filas)</p>
+<div id="80442900" class="cell" data-message="false" data-execution_count="2">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">turbidez</th>
+<th data-quarto-table-cell-role="th">B01</th>
+<th data-quarto-table-cell-role="th">B02</th>
+<th data-quarto-table-cell-role="th">B03</th>
+<th data-quarto-table-cell-role="th">B04</th>
+<th data-quarto-table-cell-role="th">B05</th>
+<th data-quarto-table-cell-role="th">B06</th>
+<th data-quarto-table-cell-role="th">B07</th>
+<th data-quarto-table-cell-role="th">B08</th>
+<th data-quarto-table-cell-role="th">B11</th>
+<th data-quarto-table-cell-role="th">B12</th>
+<th data-quarto-table-cell-role="th">B8A</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>2.0</td>
+<td>0.154084</td>
+<td>0.159396</td>
+<td>0.179478</td>
+<td>0.169389</td>
+<td>0.165166</td>
+<td>0.147962</td>
+<td>0.148928</td>
+<td>0.144704</td>
+<td>0.145196</td>
+<td>0.142432</td>
+<td>0.145041</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>3.0</td>
+<td>0.110989</td>
+<td>0.125878</td>
+<td>0.142544</td>
+<td>0.126289</td>
+<td>0.117656</td>
+<td>0.105111</td>
+<td>0.105922</td>
+<td>0.105800</td>
+<td>0.105956</td>
+<td>0.105122</td>
+<td>0.102756</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>4.0</td>
+<td>0.138499</td>
+<td>0.148825</td>
+<td>0.164533</td>
+<td>0.149489</td>
+<td>0.141852</td>
+<td>0.126794</td>
+<td>0.128209</td>
+<td>0.124919</td>
+<td>0.120849</td>
+<td>0.119675</td>
+<td>0.125167</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>4.5</td>
+<td>0.142069</td>
+<td>0.151278</td>
+<td>0.164022</td>
+<td>0.146678</td>
+<td>0.138820</td>
+<td>0.123530</td>
+<td>0.125992</td>
+<td>0.123456</td>
+<td>0.117638</td>
+<td>0.116598</td>
+<td>0.121764</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>5.0</td>
+<td>0.151660</td>
+<td>0.152667</td>
+<td>0.174633</td>
+<td>0.162644</td>
+<td>0.157842</td>
+<td>0.141958</td>
+<td>0.142584</td>
+<td>0.139756</td>
+<td>0.137141</td>
+<td>0.135852</td>
+<td>0.137965</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Cálculo de índices espectrales</p>
+<div id="cbb3493e" class="cell" data-message="false" data-execution_count="3">
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">index</th>
+<th data-quarto-table-cell-role="th">B01</th>
+<th data-quarto-table-cell-role="th">B02</th>
+<th data-quarto-table-cell-role="th">B03</th>
+<th data-quarto-table-cell-role="th">B04</th>
+<th data-quarto-table-cell-role="th">B05</th>
+<th data-quarto-table-cell-role="th">B06</th>
+<th data-quarto-table-cell-role="th">B07</th>
+<th data-quarto-table-cell-role="th">B08</th>
+<th data-quarto-table-cell-role="th">B11</th>
+<th data-quarto-table-cell-role="th">B12</th>
+<th data-quarto-table-cell-role="th">B8A</th>
+<th data-quarto-table-cell-role="th">NDTI</th>
+<th data-quarto-table-cell-role="th">NDSSI</th>
+<th data-quarto-table-cell-role="th">WRI</th>
+<th data-quarto-table-cell-role="th">S2WI</th>
+<th data-quarto-table-cell-role="th">RNDVI</th>
+<th data-quarto-table-cell-role="th">ROJO/VERDE</th>
+<th data-quarto-table-cell-role="th">MNDWI</th>
+<th data-quarto-table-cell-role="th">NIR/RED</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">turbidez</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2.0</th>
+<td>0</td>
+<td>0.154084</td>
+<td>0.159396</td>
+<td>0.179478</td>
+<td>0.169389</td>
+<td>0.165166</td>
+<td>0.147962</td>
+<td>0.148928</td>
+<td>0.144704</td>
+<td>0.145196</td>
+<td>0.142432</td>
+<td>0.145041</td>
+<td>-0.028919</td>
+<td>0.048315</td>
+<td>0.034801</td>
+<td>0.073907</td>
+<td>0.078592</td>
+<td>0.943788</td>
+<td>0.105589</td>
+<td>0.854269</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3.0</th>
+<td>1</td>
+<td>0.110989</td>
+<td>0.125878</td>
+<td>0.142544</td>
+<td>0.126289</td>
+<td>0.117656</td>
+<td>0.105111</td>
+<td>0.105922</td>
+<td>0.105800</td>
+<td>0.105956</td>
+<td>0.105122</td>
+<td>0.102756</td>
+<td>-0.060467</td>
+<td>0.086663</td>
+<td>0.076766</td>
+<td>0.056259</td>
+<td>0.088280</td>
+<td>0.885961</td>
+<td>0.147239</td>
+<td>0.837762</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4.0</th>
+<td>2</td>
+<td>0.138499</td>
+<td>0.148825</td>
+<td>0.164533</td>
+<td>0.149489</td>
+<td>0.141852</td>
+<td>0.126794</td>
+<td>0.128209</td>
+<td>0.124919</td>
+<td>0.120849</td>
+<td>0.119675</td>
+<td>0.125167</td>
+<td>-0.047909</td>
+<td>0.087328</td>
+<td>0.061214</td>
+<td>0.084800</td>
+<td>0.089536</td>
+<td>0.908563</td>
+<td>0.153072</td>
+<td>0.835644</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">4.5</th>
+<td>3</td>
+<td>0.142069</td>
+<td>0.151278</td>
+<td>0.164022</td>
+<td>0.146678</td>
+<td>0.138820</td>
+<td>0.123530</td>
+<td>0.125992</td>
+<td>0.123456</td>
+<td>0.117638</td>
+<td>0.116598</td>
+<td>0.121764</td>
+<td>-0.055824</td>
+<td>0.101270</td>
+<td>0.071941</td>
+<td>0.087003</td>
+<td>0.085966</td>
+<td>0.894256</td>
+<td>0.164681</td>
+<td>0.841679</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">5.0</th>
+<td>4</td>
+<td>0.151660</td>
+<td>0.152667</td>
+<td>0.174633</td>
+<td>0.162644</td>
+<td>0.157842</td>
+<td>0.141958</td>
+<td>0.142584</td>
+<td>0.139756</td>
+<td>0.137141</td>
+<td>0.135852</td>
+<td>0.137965</td>
+<td>-0.035546</td>
+<td>0.044152</td>
+<td>0.043297</td>
+<td>0.074875</td>
+<td>0.075691</td>
+<td>0.931348</td>
+<td>0.120255</td>
+<td>0.859270</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="ndti" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> NDTI ★</h1>
+<p><strong>Gráfico Turbidez vs NDTI</strong></p>
+<div id="1ba2c73f" class="cell" data-message="false" data-execution_count="4">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-5-output-1.png" width="422" height="422" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>con logaritmo</strong></p>
+<div id="fbeac77f" class="cell" data-message="false" data-execution_count="5">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-6-output-1.png" width="422" height="420" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="wri" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> WRI ★</h1>
+<p><strong>Water Ratio Index</strong></p>
+<p><strong>Gráfico Turbidez vs WRI</strong></p>
+<div id="3d4dd9e1" class="cell" data-message="false" data-execution_count="6">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-7-output-1.png" width="422" height="422" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Con logaritmo</p>
+<div id="d9833c3a" class="cell" data-message="false" data-execution_count="7">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-8-output-1.png" width="422" height="420" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="s2wi" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> S2WI</h1>
+<div id="4d7f9935" class="cell" data-message="false" data-execution_count="8">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-9-output-1.png" width="422" height="422" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Con logaritmo </strong></p>
+<div id="e70637d4" class="cell" data-message="false" data-execution_count="9">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-10-output-1.png" width="422" height="420" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="rndvi" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> RNDVI</h1>
+<div id="6f94789e" class="cell" data-message="false" data-execution_count="10">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-11-output-1.png" width="423" height="422" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="rojoverde" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> ROJO/VERDE ★</h1>
+<div id="4533b199" class="cell" data-message="false" data-execution_count="11">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-12-output-1.png" width="444" height="422" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Con logaritmo </strong></p>
+<div id="031084af" class="cell" data-message="false" data-execution_count="12">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-13-output-1.png" width="432" height="420" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="mnwdi" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> MNWDI</h1>
+<div id="f929c3c4" class="cell" data-message="false" data-execution_count="13">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-14-output-1.png" width="423" height="422" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="nirred" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> NIR/RED</h1>
+<div id="b517f0ec" class="cell" data-message="false" data-execution_count="14">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-15-output-1.png" width="427" height="423" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="modelado" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Modelado</h1>
+<section id="modelo-lineal-con-wri" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="modelo-lineal-con-wri"><span class="header-section-number">9.1</span> Modelo lineal con WRI</h2>
+<p>Utiliza el índice WRI y una transformación mediante logaritmo natural para estimar turbidez.</p>
+<div id="33f055dd" class="cell" data-message="false" data-execution_count="15">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-16-output-1.png" width="635" height="423" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display cell-output-markdown">
+<p><span class="math inline">\(\displaystyle \ln(\text{turbidez}) = -12.3721 \cdot WRI + 2.9531\)</span></p>
+</div>
+</div>
+</section>
+<section id="modelo-lineal-con-ndti" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="modelo-lineal-con-ndti"><span class="header-section-number">9.2</span> Modelo lineal con NDTI</h2>
+<div id="f8c704c7" class="cell" data-message="false" data-execution_count="17">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-18-output-1.png" width="635" height="423" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display cell-output-markdown">
+<p><span class="math inline">\(\displaystyle \ln(\text{turbidez}) = 17.9709 \cdot NDTI + 2.9818\)</span></p>
+</div>
+</div>
+</section>
+<section id="modelo-lineal-con-cociente-de-bandas-rojoverde" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="modelo-lineal-con-cociente-de-bandas-rojoverde"><span class="header-section-number">9.3</span> Modelo lineal con cociente de bandas ROJO/VERDE</h2>
+<div id="ae4b6a1c" class="cell" data-message="false" data-execution_count="18">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-19-output-1.png" width="635" height="423" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display cell-output-markdown">
+<p><span class="math inline">\(\displaystyle \ln(\text{turbidez}) = 8.6919 \cdot ROJO/VERDE + -5.7533\)</span></p>
+</div>
+</div>
+</section>
+<section id="mapas" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="mapas"><span class="header-section-number">9.4</span> Mapas</h2>
+<div id="67a78f84" class="cell" data-message="false" data-execution_count="19">
+<div class="cell-output cell-output-stdout">
+<pre><code>--- MODELO LINEAL CARGADO ---
+Ecuación: ln(Turbidez) = -12.3721 * WRI + 2.9531
+Se encontraron 8 archivos .tif para procesar</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-20-output-2.png" width="758" height="335" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-20-output-3.png" width="758" height="335" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-20-output-4.png" width="758" height="341" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-20-output-5.png" width="758" height="335" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-20-output-6.png" width="758" height="335" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-20-output-7.png" width="758" height="335" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-20-output-8.png" width="758" height="341" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-20-output-9.png" width="758" height="322" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="series-temporales-análisis-dentro-de-la-serie-temporal" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Series temporales análisis dentro de la serie temporal</h1>
+<p>Notas: Los cambios que ocurren en el componente de tendencia suelen indicar disturbios (por ejemplo, incendios, ataques de insectos), mientras que los cambios en el componente estacional indican cambios fenológicos (por ejemplo, cambio en el tipo de cobertura terrestre).</p>
+<p>Se asume que Tendecia es lineal por tramos, con puntos de quiebre. t1,t2,…..tn.</p>
+<p>Cada tramo tiene su propia ordenada al origen y su propia pendiente.</p>
+<p>Los puntos de quiebre estacionales pueden ocurrir en momentos diferentes a los puntos de quiebre detectados en la componente de tendencia.</p>
+<p>En el papaer usan STL para calcular el primer punto de quibre de la componente estacional.</p>
+<p>Para hacer el análisis de puntos de quiebre, a diferencia del paquete BFAST de R, en Python debemos utilizar 2 módulos para poder hacer el trabajo <strong>statsmodels</strong> y <strong>ruptures</strong></p>
+<p>Instalamos el módulo ruptures desde la consola.</p>
+<ul>
+<li>pip install ruptures</li>
+</ul>
+<p><a href="https://centre-borelli.github.io/ruptures-docs/install/">Documentación</a></p>
+<section id="serie-temporal-de-turbidez-quiebres-en-tendencia-y-estacionalidad" class="level2" data-number="10.1">
+<h2 data-number="10.1" class="anchored" data-anchor-id="serie-temporal-de-turbidez-quiebres-en-tendencia-y-estacionalidad"><span class="header-section-number">10.1</span> Serie temporal de turbidez: Quiebres en tendencia y estacionalidad</h2>
+<div id="59941164" class="cell" data-message="false" data-execution_count="21">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-22-output-1.png" width="950" height="758" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>En la componente estacional (Seasonal) los quiebres significan un cambio en la forma, la duración o la intensidad del ciclo anual.</p>
+</section>
+<section id="serie-temporal-de-conductividad-quiebres-en-tendencia-y-estacionalidad" class="level2" data-number="10.2">
+<h2 data-number="10.2" class="anchored" data-anchor-id="serie-temporal-de-conductividad-quiebres-en-tendencia-y-estacionalidad"><span class="header-section-number">10.2</span> Serie temporal de conductividad: Quiebres en tendencia y estacionalidad</h2>
+<div id="a00eac4d" class="cell" data-message="false" data-execution_count="23">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-24-output-1.png" width="948" height="758" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="serie-temporal-de-ph-quiebres-en-tendencia-y-estacionalidad" class="level2" data-number="10.3">
+<h2 data-number="10.3" class="anchored" data-anchor-id="serie-temporal-de-ph-quiebres-en-tendencia-y-estacionalidad"><span class="header-section-number">10.3</span> Serie temporal de pH: Quiebres en tendencia y estacionalidad</h2>
+<div id="6c0a4043" class="cell" data-message="false" data-execution_count="25">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-26-output-1.png" width="942" height="758" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="análisis-con-fft-fast-fourier-transform" class="level1" data-number="11">
+<h1 data-number="11"><span class="header-section-number">11</span> Análisis con FFT (Fast Fourier Transform)</h1>
+<p>Transformada Rápida de Fourier</p>
+<p>de la librería SciPy, podemos usar paquete Signal processing (scipy.signal), del cual importamos en el módulo Spectral analysis.</p>
+<div id="8cb2f642" class="cell" data-message="false" data-execution_count="26">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-27-output-1.png" width="950" height="374" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="712546f4" class="cell" data-message="false" data-execution_count="27">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-28-output-1.png" width="950" height="374" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="análisis-de-serie-temporal-de-turbidez-aplicación-transformada-de-fourier" class="level1" data-number="12">
+<h1 data-number="12"><span class="header-section-number">12</span> Análisis de serie temporal de turbidez, aplicación transformada de Fourier</h1>
+<p>La transformada de Fourier aplicada a una serie temporal permite pasar del dominio del tiempo (valores medidos a lo largo de los días, meses o segundos) al dominio de la frecuencia, desarmando la señal en una suma de ondas sinusoidales simples de distintas amplitudes y fases</p>
+<div id="40d0300b" class="cell" data-message="false" data-execution_count="28">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-29-output-1.png" width="1142" height="758" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="análisis-de-serie-temporal-de-conductividad-aplicación-transformada-de-fourier" class="level1" data-number="13">
+<h1 data-number="13"><span class="header-section-number">13</span> Análisis de serie temporal de conductividad, aplicación transformada de Fourier</h1>
+<div id="f5b3c1d9" class="cell" data-message="false" data-execution_count="29">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-30-output-1.png" width="1142" height="758" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="análisis-de-serie-temporal-de-ph-aplicación-transformada-de-fourier" class="level1" data-number="14">
+<h1 data-number="14"><span class="header-section-number">14</span> Análisis de serie temporal de ph, aplicación transformada de Fourier</h1>
+<div id="98b917f4" class="cell" data-message="false" data-execution_count="30">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pestana6_files/figure-html/cell-31-output-1.png" width="1143" height="758" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
